@@ -3,12 +3,14 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from 'nestjs-config';
 import * as path from 'path';
+import { UsersModule } from './users/users.module';
 import { EventModule } from './blockchain/ethereum/event/event.module';
 
 @Module({
   imports: [
     ConfigModule.load(path.resolve(__dirname, 'config', '**/!(*.d).{ts,js}')),
     EventModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
