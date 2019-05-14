@@ -25,19 +25,25 @@ export class UsersService {
         }
 
         let user = await this.usersRepository.findByAddress(userDto.address);
-        if (user == null) {
-            throw new Error('user with the address doesnt exist');
+        if (user == undefined) {
+            throw new Error('user with the address doesnt exists');
         }
+
+        //todo: business logic but for now i think user can't modify the field "address"
 
         return this.usersRepository.save(user);
     }
 
     async createUser(userDto: UserDto): Promise<User> {
         // todo: isAbleToCreate로 추상화.
-        if (userDto.address == null) {
-            throw new Error('address is null');
+        if (userDto.address == undefined) {
+            throw new Error('address is undefined');
         }
-        // todo: userRepository에서 findByAddress를 구현 후, 여기에서 findByAddress를 하여 이미 address가 있는 지 확인.
+
+        let userForCheck = await this.usersRepository.findByAddress(userDto.address);
+        if (userForCheck != undefined) {
+            throw new Error('user with the address already exists')
+        }
 
         const user = new User();
         user.address = userDto.address;

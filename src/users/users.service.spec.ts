@@ -3,14 +3,17 @@ import { UsersService } from './users.service';
 import {User} from './user.entity';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import {UserDto} from './user.dto';
-import {UsersModule} from './users.module';
 
 describe('UsersService', async () => {
 
   let service: UsersService;
   const mockUser = new User();
-  mockUser.address = 'testAddress';
   mockUser.id = 1;
+  mockUser.address = 'testAddress';
+
+  const mockUserUpdated = new User();
+  mockUserUpdated.id = 1;
+  mockUserUpdated.address = 'testAddressUpdated';
 
   beforeAll(async () => {
 
@@ -32,31 +35,126 @@ describe('UsersService', async () => {
         TypeOrmModule.forFeature([User]),
       ],
     })
-        .overrideProvider(getRepositoryToken(User))
-        .useValue({
-          save: () => mockUser,
-          findById: () => mockUser,
-          delete: () => undefined,
-        })
         .compile();
 
     service = module.get<UsersService>(UsersService);
+
+
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
 
-  it('should be saved, get', async () => {
+  it('should be saved', async () => {
+
+    //given
+    const module = await Test.createTestingModule({
+      providers: [
+        UsersService,
+      ],
+      imports: [
+        TypeOrmModule.forFeature([User]),
+      ],
+    })
+        .overrideProvider(getRepositoryToken(User))
+        .useValue({
+          save: () => mockUser,
+          findById: () => mockUser,
+        })
+        .compile();
+
+    service = module.get<UsersService>(UsersService);
 
     const newUserDto = new UserDto();
     newUserDto.address = 'testAddress';
+
+    //when
     const createdUser = await service.createUser(newUserDto);
+
+    //then
     expect(createdUser.address).toBe(newUserDto.address);
+
+    //when
     const retrievedUser = await service.getUser(1);
-    expect(retrievedUser.address).toBe(newUserDto.address);
-    const deletedUser = await service.deleteUser(1);
-    expect(deletedUser).toBeUndefined()
+
+    //then
+    expect(retrievedUser.address).toBe(createdUser.address);
+
+  });
+
+  it('should not be saved', async () => {
+    //given
+    const module = await Test.createTestingModule({
+      providers: [
+        UsersService,
+      ],
+      imports: [
+        TypeOrmModule.forFeature([User]),
+      ],
+    })
+        .overrideProvider(getRepositoryToken(User))
+        .useValue({
+          findByAddress:() => mockUser,
+
+        })
+        .compile();
+
+    service = module.get<UsersService>(UsersService);
+
+    const newUserDto = new UserDto();
+
+    //when & then
+    await expect(service.createUser(newUserDto))
+        .rejects
+        .toThrowError('address is undefined');
+
+    //given
+    newUserDto.address = 'testAddress';
+
+    //when & then
+    await expect(service.createUser(newUserDto))
+        .rejects
+        .toThrowError('user with the address already exists')
+
+  });
+
+  it('shoud be updated', async () => {
+
+    //given
+    const module = await Test.createTestingModule({
+      providers: [
+        UsersService,
+      ],
+      imports: [
+        TypeOrmModule.forFeature([User]),
+      ],
+    })
+        .overrideProvider(getRepositoryToken(User))
+        .useValue({
+          findById:() => mockUserUpdated,
+          findByAddress:() => mockUser,
+          save: () => mockUserUpdated,
+
+        })
+        .compile();
+
+    service = module.get<UsersService>(UsersService);
+
+    const newUserDto = new UserDto();
+    newUserDto.address = 'testAddressUpdated';
+
+    //when
+    const updatedUser = await service.updateUser(newUserDto);
+
+    //then
+    expect(updatedUser.address).toBe(newUserDto.address);
+
+    //when
+    const retrievedUser = await service.getUser(1);
+
+    //then
+    expect(retrievedUser.address).toBe(updatedUser.address);
 
   });
 
