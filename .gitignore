@@ -131,3 +131,4 @@ Temporary Items
 # hatchout-server
 .prettierrc
 node_modules/
+coverage/
