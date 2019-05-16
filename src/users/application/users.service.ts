@@ -1,5 +1,5 @@
-import {User} from './user.entity';
-import {UserDto} from './user.dto';
+import {User} from '../domain/user.entity';
+import {UserDto} from '../domain/dto/user.dto';
 
 export interface UsersService {
     get(id: number): Promise<User>;

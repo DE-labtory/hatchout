@@ -1,7 +1,11 @@
 import { Module } from '@nestjs/common';
-import {User} from './user.entity';
+import {User} from './domain/user.entity';
 import {TypeOrmModule} from '@nestjs/typeorm';
-import {UsersServiceImpl} from './users.service.impl';
+import {UserServiceImpl} from './application/user.service.impl';
+import {UserService} from './domain/user.service';
+
+import * as api from './application/user.service.impl';
+import * as domain from  './domain/user.service.impl';
 
 @Module({
     imports: [
@@ -20,7 +24,8 @@ import {UsersServiceImpl} from './users.service.impl';
         TypeOrmModule.forFeature([User]),
     ],
     providers: [
-      UsersServiceImpl,
+        api.UserServiceImpl,
+        domain.UserServiceImpl,
     ],
 })
 export class UsersModule {}

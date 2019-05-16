@@ -1,7 +1,7 @@
-import {User} from './user.entity';
-import {UserDto} from './user.dto';
+import {User} from '../domain/user.entity';
+import {UserDto} from '../domain/dto/user.dto';
 import {UsersService} from './users.service';
-import {UsersServiceImpl} from './users.service.impl';
+import {UserServiceImpl} from './user.service.impl';
 
 //given
 const mockUser = new User();
@@ -19,7 +19,7 @@ describe('UsersService', async () => {
   beforeAll(async () => {
 
   const mockRepository = makeMockRepository(null, null, null);
-  service = new UsersServiceImpl(mockRepository);
+  service = new UserServiceImpl(mockRepository);
   });
 
   it('should be defined', () => {
@@ -30,7 +30,7 @@ describe('UsersService', async () => {
     //given
     const mockRepository = makeMockRepository(mockUser, undefined, mockUser);
 
-    service = new UsersServiceImpl(mockRepository);
+    service = new UserServiceImpl(mockRepository);
 
     const newUserDto = new UserDto();
     newUserDto.address = 'testAddress';
@@ -54,7 +54,7 @@ describe('UsersService', async () => {
     //given
     const mockRepository = makeMockRepository(null, mockUser, null );
 
-    service = new UsersServiceImpl(mockRepository);
+    service = new UserServiceImpl(mockRepository);
 
     const newUserDto = new UserDto();
 
@@ -77,7 +77,7 @@ describe('UsersService', async () => {
     //given
     const mockRepository = makeMockRepository(mockUserUpdated, mockUser, mockUserUpdated);
 
-    service = new UsersServiceImpl(mockRepository);
+    service = new UserServiceImpl(mockRepository);
 
     const newUserDto = new UserDto();
     newUserDto.address = 'testAddressUpdated';
@@ -101,7 +101,7 @@ describe('UsersService', async () => {
     //given
     const mockRepository = makeMockRepository(null, undefined, null);
 
-    service = new UsersServiceImpl(mockRepository);
+    service = new UserServiceImpl(mockRepository);
 
     const newUserDto = new UserDto();
 
@@ -131,7 +131,7 @@ describe('UsersService', async () => {
         //given
         const mockRepository = makeMockRepository(mockUser, null, null);
 
-        service = new UsersServiceImpl(mockRepository);
+        service = new UserServiceImpl(mockRepository);
         expect(await service.delete(1)).toBeUndefined();
     });
 
@@ -140,7 +140,7 @@ describe('UsersService', async () => {
         //given
         const mockRepository = makeMockRepository(undefined, null, null);
 
-        service = new UsersServiceImpl(mockRepository);
+        service = new UserServiceImpl(mockRepository);
 
         //when & then
         await expect(service.delete(null))

@@ -1,7 +1,7 @@
 import {Injectable} from '@nestjs/common';
-import { User } from './user.entity';
+import { User } from '../domain/user.entity';
 import { Controller, Post, Body, Get, Put, Delete, Param} from '@nestjs/common';
-import {UsersService} from './users.service';
+import {UsersService} from '../application/users.service';
 
 @Injectable()
 @Controller('users')
