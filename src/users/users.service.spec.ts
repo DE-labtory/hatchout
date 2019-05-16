@@ -1,46 +1,25 @@
-import { Test } from '@nestjs/testing';
 import {User} from './user.entity';
-import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import {UserDto} from './user.dto';
 import {UsersService} from './users.service';
 import {UsersServiceImpl} from './users.service.impl';
 
+//given
+const mockUser = new User();
+mockUser.id = 1;
+mockUser.address = 'testAddress';
+
+const mockUserUpdated = new User();
+mockUserUpdated.id = 1;
+mockUserUpdated.address = 'testAddressUpdated';
+
 describe('UsersService', async () => {
 
   let service: UsersService;
-  const mockUser = new User();
-  mockUser.id = 1;
-  mockUser.address = 'testAddress';
-
-  const mockUserUpdated = new User();
-  mockUserUpdated.id = 1;
-  mockUserUpdated.address = 'testAddressUpdated';
 
   beforeAll(async () => {
 
-    const module = await Test.createTestingModule({
-      providers: [
-          UsersServiceImpl,
-      ],
-      imports: [
-        TypeOrmModule.forRoot({
-          type: 'mysql',
-          host: 'localhost',
-          port: 3306,
-          username: 'root',
-          password: 'rootpassword',
-          database: 'hatchout_server',
-          entities: [__dirname + '/**/*.entity{.ts,.js}'],
-          synchronize: true,
-        }),
-        TypeOrmModule.forFeature([User]),
-      ],
-    })
-        .compile();
-
-    service = module.get<UsersService>(UsersServiceImpl);
-
-
+  const mockRepository = makeMockRepository(null, null, null);
+  service = new UsersServiceImpl(mockRepository);
   });
 
   it('should be defined', () => {
@@ -48,25 +27,10 @@ describe('UsersService', async () => {
   });
 
   it('should be saved', async () => {
-
     //given
-    const module = await Test.createTestingModule({
-      providers: [
-          UsersServiceImpl,
-      ],
-      imports: [
-        TypeOrmModule.forFeature([User]),
-      ],
-    })
-        .overrideProvider(getRepositoryToken(User))
-        .useValue({
-            save: () => mockUser,
-            findById: () => mockUser,
-            findByAddress: () => undefined,
-        })
-        .compile();
+    const mockRepository = makeMockRepository(mockUser, undefined, mockUser);
 
-    service = module.get<UsersService>(UsersServiceImpl);
+    service = new UsersServiceImpl(mockRepository);
 
     const newUserDto = new UserDto();
     newUserDto.address = 'testAddress';
@@ -86,24 +50,11 @@ describe('UsersService', async () => {
   });
 
   it('should not be saved', async () => {
+
     //given
-    const module = await Test.createTestingModule({
-      providers: [
-          UsersServiceImpl,
-      ],
-      imports: [
-        TypeOrmModule.forFeature([User]),
-      ],
-    })
-        .overrideProvider(getRepositoryToken(User))
-        .useValue({
-          findByAddress:() => mockUser,
-            save:() => undefined,
+    const mockRepository = makeMockRepository(null, mockUser, null );
 
-        })
-        .compile();
-
-    service = module.get<UsersService>(UsersServiceImpl);
+    service = new UsersServiceImpl(mockRepository);
 
     const newUserDto = new UserDto();
 
@@ -123,26 +74,10 @@ describe('UsersService', async () => {
   });
 
   it('shoud be updated', async () => {
-
     //given
-    const module = await Test.createTestingModule({
-      providers: [
-          UsersServiceImpl,
-      ],
-      imports: [
-        TypeOrmModule.forFeature([User]),
-      ],
-    })
-        .overrideProvider(getRepositoryToken(User))
-        .useValue({
-          findById:() => mockUserUpdated,
-          findByAddress:() => mockUser,
-          save: () => mockUserUpdated,
+    const mockRepository = makeMockRepository(mockUserUpdated, mockUser, mockUserUpdated);
 
-        })
-        .compile();
-
-    service = module.get<UsersService>(UsersServiceImpl);
+    service = new UsersServiceImpl(mockRepository);
 
     const newUserDto = new UserDto();
     newUserDto.address = 'testAddressUpdated';
@@ -162,22 +97,11 @@ describe('UsersService', async () => {
   });
 
   it('should not be updated', async () => {
-    //given
-    const module = await Test.createTestingModule({
-      providers: [
-          UsersServiceImpl,
-      ],
-      imports: [
-        TypeOrmModule.forFeature([User]),
-      ],
-    })
-        .overrideProvider(getRepositoryToken(User))
-        .useValue({
-          findByAddress:() => undefined,
-        })
-        .compile();
 
-    service = module.get<UsersService>(UsersServiceImpl);
+    //given
+    const mockRepository = makeMockRepository(null, undefined, null);
+
+    service = new UsersServiceImpl(mockRepository);
 
     const newUserDto = new UserDto();
 
@@ -186,12 +110,13 @@ describe('UsersService', async () => {
         .rejects
         .toThrowError('unable to update');
 
+    //given
     newUserDto.address = 'testAddress';
 
-      //when & then
-      await expect(service.update(newUserDto))
-          .rejects
-          .toThrowError('unable to update')
+    //when & then
+    await expect(service.update(newUserDto))
+        .rejects
+        .toThrowError('unable to update')
   });
 
     it('should not get', async () => {
@@ -202,30 +127,45 @@ describe('UsersService', async () => {
 
     });
 
+    it('should delete', async () => {
+        //given
+        const mockRepository = makeMockRepository(mockUser, null, null);
+
+        service = new UsersServiceImpl(mockRepository);
+        expect(await service.delete(1)).toBeUndefined();
+    });
+
     it('should not delete', async () => {
 
-        const module = await Test.createTestingModule({
-            providers: [
-                UsersServiceImpl,
-            ],
-            imports: [
-                TypeOrmModule.forFeature([User]),
-            ],
-        })
-            .overrideProvider(getRepositoryToken(User))
-            .useValue({
-                findById:() => undefined,
-            })
-            .compile();
+        //given
+        const mockRepository = makeMockRepository(undefined, null, null);
 
-        service = module.get<UsersService>(UsersServiceImpl);
+        service = new UsersServiceImpl(mockRepository);
 
         //when & then
         await expect(service.delete(null))
             .rejects
-            .toThrowError('unable to delete')
+            .toThrowError('unable to delete');
 
+        //when & then
 
+        await expect(service.delete(1))
+            .rejects
+            .toThrowError('unable to delete');
     });
 
 });
+
+function makeMockRepository(findById: User, findByAddress: User, save: User) {
+    const MockRepository = jest.fn().mockImplementation(() => {
+        return {
+
+            findById: jest.fn().mockImplementation(() => findById),
+            findByAddress: jest.fn().mockImplementation(() => findByAddress),
+            save: jest.fn().mockImplementation(() => save),
+            delete: jest.fn().mockImplementation(() => undefined)
+        };
+    });
+
+    return new MockRepository();
+}

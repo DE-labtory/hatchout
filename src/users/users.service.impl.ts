@@ -4,6 +4,7 @@ import { User } from './user.entity';
 import {UserDto} from './user.dto';
 import {UsersRepository} from './users.repository';
 import {UsersService} from './users.service';
+import {DeleteResult} from 'typeorm';
 
 
 
@@ -68,16 +69,24 @@ export class UsersServiceImpl implements UsersService{
     }
 
 
-    async delete(id: number) {
+    async delete(id: number):Promise<DeleteResult> {
 
         if (!await this.isAbleToDelete(id)) {
             throw new Error('unable to delete')
         }
 
+        console.log('llll');
+        let deleteResult = await this.usersRepository.delete(id);
+        console.log(deleteResult);
+
         return await this.usersRepository.delete(id);
     }
 
     private async isAbleToDelete(id: number) :Promise<boolean>{
+        if (id == null) {
+            return false;
+        }
+
         const user = await this.usersRepository.findById(id);
         return user != undefined;
     }
