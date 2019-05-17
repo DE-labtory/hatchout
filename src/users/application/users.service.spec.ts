@@ -2,6 +2,7 @@ import {User} from '../domain/user.entity';
 import {UserDto} from '../domain/dto/user.dto';
 import {UsersService} from './users.service';
 import {UserServiceImpl} from './user.service.impl';
+import {newMockRepository} from '../../mock/factory';
 
 //given
 const mockUser = new User();
@@ -18,7 +19,7 @@ describe('UsersService', async () => {
 
   beforeAll(async () => {
 
-  const mockRepository = makeMockRepository(null, null, null);
+  const mockRepository = newMockRepository(null, null, null);
   service = new UserServiceImpl(mockRepository);
   });
 
@@ -28,7 +29,7 @@ describe('UsersService', async () => {
 
   it('should be saved', async () => {
     //given
-    const mockRepository = makeMockRepository(mockUser, undefined, mockUser);
+    const mockRepository = newMockRepository(mockUser, undefined, mockUser);
 
     service = new UserServiceImpl(mockRepository);
 
@@ -52,7 +53,7 @@ describe('UsersService', async () => {
   it('should not be saved', async () => {
 
     //given
-    const mockRepository = makeMockRepository(null, mockUser, null );
+    const mockRepository = newMockRepository(null, mockUser, null );
 
     service = new UserServiceImpl(mockRepository);
 
@@ -75,7 +76,7 @@ describe('UsersService', async () => {
 
   it('shoud be updated', async () => {
     //given
-    const mockRepository = makeMockRepository(mockUserUpdated, mockUser, mockUserUpdated);
+    const mockRepository = newMockRepository(mockUserUpdated, mockUser, mockUserUpdated);
 
     service = new UserServiceImpl(mockRepository);
 
@@ -99,7 +100,7 @@ describe('UsersService', async () => {
   it('should not be updated', async () => {
 
     //given
-    const mockRepository = makeMockRepository(null, undefined, null);
+    const mockRepository = newMockRepository(null, undefined, null);
 
     service = new UserServiceImpl(mockRepository);
 
@@ -129,7 +130,7 @@ describe('UsersService', async () => {
 
     it('should delete', async () => {
         //given
-        const mockRepository = makeMockRepository(mockUser, null, null);
+        const mockRepository = newMockRepository(mockUser, null, null);
 
         service = new UserServiceImpl(mockRepository);
         expect(await service.delete(1)).toBeUndefined();
@@ -138,7 +139,7 @@ describe('UsersService', async () => {
     it('should not delete', async () => {
 
         //given
-        const mockRepository = makeMockRepository(undefined, null, null);
+        const mockRepository = newMockRepository(undefined, null, null);
 
         service = new UserServiceImpl(mockRepository);
 
@@ -156,16 +157,4 @@ describe('UsersService', async () => {
 
 });
 
-function makeMockRepository(findById: User, findByAddress: User, save: User) {
-    const MockRepository = jest.fn().mockImplementation(() => {
-        return {
 
-            findById: jest.fn().mockImplementation(() => findById),
-            findByAddress: jest.fn().mockImplementation(() => findByAddress),
-            save: jest.fn().mockImplementation(() => save),
-            delete: jest.fn().mockImplementation(() => undefined)
-        };
-    });
-
-    return new MockRepository();
-}
