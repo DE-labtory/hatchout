@@ -60,5 +60,10 @@
     },
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "tslint --fix -c ./tslint.json 'src/**/*{.ts,.tsx}'"
+    }
   }
 }
