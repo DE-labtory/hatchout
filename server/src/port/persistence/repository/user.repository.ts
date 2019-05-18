@@ -1,12 +1,10 @@
-import { DeepPartial, EntityRepository, Repository, SaveOptions } from 'typeorm';
-import { Ghost } from '../../../domain/ghost/ghost.entity';
+import {DeleteResult} from 'typeorm';
+import {User} from '../../../domain/user/user.entity';
+import {Ghost} from '../../../domain/ghost/ghost.entity';
 
-@EntityRepository(Ghost)
-export class GhostRepository extends Repository<Ghost> implements IGhostRepository {
-
-}
-
-interface IGhostRepository {
-  findOne(id?: string): Promise<Ghost | undefined>;
-  save(entity: Ghost): Promise<Ghost>;
+export interface IUserRepository {
+    save(entity: User): Promise<User>;
+    findById(id: number): Promise<User>;
+    findByAddress(address: string): Promise<User>;
+    delete(criteria: number): Promise<DeleteResult>;
 }
