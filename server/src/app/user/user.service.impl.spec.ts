@@ -4,6 +4,7 @@ import {TestingModule, Test} from '@nestjs/testing';
 import {User} from '../../domain/user/user.entity';
 import {UserDto} from '../../domain/user/dto/user.dto';
 import {UserRepository} from '../../port/persistence/repository/user.repository.impl';
+import {BadRequestException} from "@nestjs/common";
 
 describe('UserServiceImpl', () => {
     const address = 'testAddress';
@@ -44,11 +45,13 @@ describe('UserServiceImpl', () => {
 
             expect(await service.get(id)).toBe(user);
         });
-        it('should return undefined', async () => {
+        it('should throw BadRequestException', async () => {
             when(mockRepository.findById(null)).thenReturn(undefined);
             service = new UserServiceImpl(instance(mockRepository));
 
-            expect(await service.get(null)).toBeUndefined();
+            await expect(service.get(null))
+                .rejects
+                .toThrowError(BadRequestException);
         });
     });
     describe('#create()', () => {

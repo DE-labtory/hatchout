@@ -1,4 +1,4 @@
-import {Inject, Injectable} from '@nestjs/common';
+import {BadRequestException, Inject, Injectable} from '@nestjs/common';
 import {UserService} from './user.service';
 import {UserDto} from '../../domain/user/dto/user.dto';
 import {User} from '../../domain/user/user.entity';
@@ -11,6 +11,10 @@ export class UserServiceImpl implements UserService {
     constructor(@Inject('IUserRepository') private userRepository: IUserRepository) {}
 
     async get(id: number): Promise<User> {
+        let user = await this.userRepository.findById(id);
+        if (user == undefined) {
+            throw new BadRequestException('no user with the id')
+        }
         return await this.userRepository.findById(id);
     }
     async create(userDto: UserDto): Promise<User> {
