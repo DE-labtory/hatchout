@@ -16,12 +16,4 @@ echo "npm test failed" >&2
 exit 1
 fi
 
-# npm test and check coverage
-npm run test:cov
-
-if [[ $? -ne 0 ]]; then
-echo "npm test coverage failed" >&2
-exit 1
-fi
-
 exit 0
