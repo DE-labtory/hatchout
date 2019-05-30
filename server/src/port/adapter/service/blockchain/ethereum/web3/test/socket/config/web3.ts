@@ -1,4 +1,4 @@
 export default {
-    url: 'localhost:8545',
+    url: 'ws://localhost:8545',
     type: 'socket',
 };
