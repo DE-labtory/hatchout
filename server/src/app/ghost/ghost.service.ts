@@ -2,6 +2,7 @@ import {Injectable} from '@nestjs/common';
 import {Ghost} from '../../domain/ghost/ghost.entity';
 import {InjectRepository} from '@nestjs/typeorm';
 import {IGhostRepository} from '../../domain/ghost/ghost.repository';
+import {GhostDto} from './dto/ghost.dto';
 
 @Injectable()
 export class GhostService {
@@ -28,5 +29,30 @@ export class GhostService {
       take: 25,
       skip: 25 * (page - 1),
     });
+  }
+
+  async createEgg(ghostDto: GhostDto): Promise<Ghost> {
+    const newGhost = new Ghost(ghostDto.gene, 0, ghostDto.owner);
+    return await this.ghostRepository.save(newGhost);
+  }
+
+  async transfer(from: string, to: string, gene: string): Promise<Ghost> {
+    const updatedGhost = await this.ghostRepository.findOne(
+        {
+          gene,
+        },
+    );
+    updatedGhost.setUserId(to);
+    return await this.ghostRepository.save(updatedGhost);
+  }
+
+  async levelUp(gene: string, level: number): Promise<Ghost> {
+    const updatedGhost = await this.ghostRepository.findOne(
+        {
+          gene,
+        },
+    );
+    updatedGhost.setLevel(level);
+    return await this.ghostRepository.save(updatedGhost[0]);
   }
 }
