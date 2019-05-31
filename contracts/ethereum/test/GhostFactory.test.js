@@ -39,6 +39,10 @@ contract('MockGhostFactory', accounts => {
       await shouldFail.reverting(GhostFactory.createEgg(geneOfGhost, constants.ZERO_ADDRESS, signature));
     });
 
+    it('reverts when ghost\'s gene is too big', async () => {
+      await shouldFail.reverting(GhostFactory.createEgg(constants.MAX_INT256, owner, signature));
+    });
+
     it('revert when signature is not same', async () => {
       const wrongSignature = await web3.eth.sign(hash, ceo);
 
@@ -64,22 +68,26 @@ contract('MockGhostFactory', accounts => {
       signature = await web3.eth.sign(hash, owner);
     });
 
+    it('reverts when fee of level up is too low', async () => {
+      await shouldFail.reverting(GhostFactory.levelUp(ceo, ghostID, signature, {from: owner, value: web3.utils.toWei("1", "szabo")}));
+    });
+
     it('reverts when ghost\'s owner is zero address', async () => {
-      await shouldFail.reverting(GhostFactory.levelUp(constants.ZERO_ADDRESS, ghostID, signature, {from: owner}));
+      await shouldFail.reverting(GhostFactory.levelUp(constants.ZERO_ADDRESS, ghostID, signature, {from: owner, value: web3.utils.toWei("0", "szabo")}));
     });
 
     it('reverts when owner who does not have the ghost', async () => {
-      await shouldFail.reverting(GhostFactory.levelUp(ceo, ghostID, signature, {from: owner}));
+      await shouldFail.reverting(GhostFactory.levelUp(ceo, ghostID, signature, {from: owner, value: web3.utils.toWei("0", "szabo")}));
     });
 
     it('reverts when signature is not same', async () => {
       const wrongSignature = await web3.eth.sign(hash, ceo);
 
-      await shouldFail.reverting(GhostFactory.levelUp(owner, ghostID, wrongSignature, {from: owner}));
+      await shouldFail.reverting(GhostFactory.levelUp(owner, ghostID, wrongSignature, {from: owner, value: web3.utils.toWei("0", "szabo")}));
     });
 
     it('successfully the ghost\'s level up', async () => {
-      await GhostFactory.levelUp(owner, ghostID, signature, {from: owner});
+      await GhostFactory.levelUp(owner, ghostID, signature, {from: owner, value: web3.utils.toWei("1", "szabo")});
 
       expect(await GhostFactory.getLevelOfGhost(ghostID)).to.be.bignumber.equal(new BN(1));
     });

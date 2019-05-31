@@ -4,13 +4,13 @@ import "../GhostBase.sol";
 
 contract MockGhostBase is GhostBase {
 
-    constructor (address _ceoAddress) public GhostBase(_ceoAddress){}
+    constructor (address payable _ceoAddress) public GhostBase(_ceoAddress){}
 
     function transfer(address _from, address _to, uint256 _tokenId) external {
         _transfer(_from, _to, _tokenId);
     }
 
-    function createEgg(uint256 _gene, address _owner) external {
+    function createEgg(uint64 _gene, address _owner) external {
         _createEgg(_gene, _owner);
     }
 
@@ -22,11 +22,11 @@ contract MockGhostBase is GhostBase {
         return ghostIndexToOwner[_tokenId] == _owner;
     }
 
-    function getLevelLimit() external view returns (uint256) {
+    function getLevelLimit() external view returns (uint8) {
         return levelLimit;
     }
 
-    function getLevelOfGhost(uint256 _tokenId) external view returns (uint256) {
-        return uint256(ghosts[_tokenId].level);
+    function getLevelOfGhost(uint256 _tokenId) external view returns (uint8) {
+        return ghosts[_tokenId].level;
     }
 }
