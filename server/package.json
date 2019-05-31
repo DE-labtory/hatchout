@@ -68,8 +68,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "tslint --fix -c ./tslint.json -p ./tsconfig.json 'src/**/*{.ts,.tsx}' && npm run lint",
-      "pre-push": "npm run lint && npm run test"
+      "pre-commit": "tslint --fix -c ./tslint.json -p ./tsconfig.json 'src/**/*{.ts,.tsx}' && npm run lint"
     }
   }
 }
