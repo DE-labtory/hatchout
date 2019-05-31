@@ -4,9 +4,9 @@ import "../GhostFactory.sol";
 
 contract MockGhostFactory is GhostFactory {
 
-    constructor (address _ceoAddress) public GhostFactory(_ceoAddress){}
+    constructor (address payable _ceoAddress) public GhostFactory(_ceoAddress){}
 
-    function getLevelOfGhost(uint256 _tokenId) external view returns (uint256) {
-        return uint256(ghosts[_tokenId].level);
+    function getLevelOfGhost(uint256 _tokenId) external view returns (uint8) {
+        return ghosts[_tokenId].level;
     }
 }

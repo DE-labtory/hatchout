@@ -55,7 +55,7 @@ contract('MockGhostBase', accounts => {
     });
 
     it('emit LevelUp event on successful level increment', async () => {
-      await expectEvent.inLogs(receipt.logs, 'LevelUp', { owner: owner, tokenId: ghostID, level: levelOfGhostID});
+      await expectEvent.inLogs(receipt.logs, 'LevelUp', { owner: owner, gene: geneOfGhost, level: levelOfGhostID});
     });
 
     it('updates ghost\'s level on successful LevelUp event', async () => {
@@ -64,13 +64,19 @@ contract('MockGhostBase', accounts => {
   });
 
   describe('#transfer()', () => {
+    let receipt;
+
+    beforeEach(async () => {
+      receipt = await GhostBase.createEgg(geneOfGhost, owner);
+    });
+
     it('reverts when transferring ghost to the zero address', async () => {
       await shouldFail.reverting(GhostBase.transfer(owner, constants.ZERO_ADDRESS, ghostID));
     });
 
     it('emit Transfer event on successful transfer', async () => {
-      const { logs } = await GhostBase.transfer(owner, receiver, ghostID);
-      await expectEvent.inLogs(logs, 'Transfer', {from: owner, to: receiver, tokenId: ghostID});
+      receipt = await GhostBase.transfer(owner, receiver, ghostID);
+      await expectEvent.inLogs(receipt.logs, 'Transfer', {from: owner, to: receiver, gene: geneOfGhost});
     });
 
     it('updates owner on successful transfer', async () => {

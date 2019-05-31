@@ -4,16 +4,16 @@ import "./AccessControl.sol";
 
 contract GhostBase is AccessControl {
 
-    event Transfer(address from, address to, uint256 tokenId);
+    event Transfer(address from, address to, uint256 gene);
     event Birth(address owner, uint256 tokenId, uint256 gene);
-    event LevelUp(address owner, uint256 tokenId, uint256 level);
+    event LevelUp(address owner, uint256 gene, uint256 level);
     event Approval(address from, address to, uint256 tokenId);
 
-    constructor (address _ceoAddress) public AccessControl(_ceoAddress){}
+    constructor (address payable _ceoAddress) public AccessControl(_ceoAddress){}
 
     struct Ghost {
         // Ghosts have unique genetic code which is packed into 256-bits.
-        uint256 gene;
+        uint64 gene;
 
         // timestamp when ghost is born.
         uint64 birthTime;
@@ -44,16 +44,18 @@ contract GhostBase is AccessControl {
 
         ownershipTokenCount[_to]++;
         ghostIndexToOwner[_tokenId] = _to;
+
+        uint256 gene = ghosts[_tokenId].gene;
         delete ghostIndexToApproved[_tokenId];
 
         ownershipTokenCount[_from]--;
 
-        emit Transfer(_from, _to, _tokenId);
+        emit Transfer(_from, _to, gene);
     }
 
     // @dev create egg that ghost with level 0.
     //  Given owner owns this egg.
-    function _createEgg(uint256 _gene, address _owner) internal {
+    function _createEgg(uint64 _gene, address _owner) internal {
         Ghost memory _ghost = Ghost({
             gene: _gene,
             birthTime: uint64(now),
@@ -71,13 +73,13 @@ contract GhostBase is AccessControl {
 
         // TODO: setting limit of level
         require(ghosts[_tokenId].level < levelLimit);
+        uint256 gene = ghosts[_tokenId].gene;
         ghosts[_tokenId].level++;
-        emit LevelUp(_owner, _tokenId, ghosts[_tokenId].level);
+        emit LevelUp(_owner, gene, ghosts[_tokenId].level);
     }
 
-    function setLevelLimit(uint256 _levelLimit) external onlyCEO {
-        require(_levelLimit > uint256(0));
-        require(_levelLimit == uint256(uint8(_levelLimit)));
+    function setLevelLimit(uint8 _levelLimit) external onlyCEO {
+        require(_levelLimit > 0);
 
         levelLimit = uint8(_levelLimit);
     }
