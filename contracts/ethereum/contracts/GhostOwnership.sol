@@ -21,7 +21,7 @@ contract GhostOwnership is GhostBase, ERC721 {
     bytes4(keccak256('transferFrom(address,address,uint256)')) ^
     bytes4(keccak256('tokensOfOwner(address)'));
 
-    constructor (address _ceoAddress) public GhostBase(_ceoAddress){}
+    constructor (address payable _ceoAddress) public GhostBase(_ceoAddress){}
 
     /// @dev Introspection interface as per ERC-165 (https://github.com/ethereum/EIPs/issues/165).
     ///  Returns true for any standardized interfaces implemented by this contract. We implement
@@ -113,5 +113,9 @@ contract GhostOwnership is GhostBase, ERC721 {
         }
 
         return result;
+    }
+
+    function getGene(uint256 _tokenId) public view returns (uint256) {
+        return ghosts[_tokenId].gene;
     }
 }

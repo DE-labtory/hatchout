@@ -1,9 +1,9 @@
 pragma solidity ^0.5.0;
 
 contract AccessControl {
-    address public ceoAddress;
+    address payable public ceoAddress;
 
-    constructor (address _ceoAddress) public {
+    constructor (address payable _ceoAddress) public {
         ceoAddress = _ceoAddress;
     }
 
@@ -12,7 +12,7 @@ contract AccessControl {
         _;
     }
 
-    function setCEO(address _newCEO) external onlyCEO {
+    function setCEO(address payable _newCEO) external onlyCEO {
         require(_newCEO != address(0));
 
         ceoAddress = _newCEO;

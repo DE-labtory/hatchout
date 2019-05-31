@@ -21,10 +21,17 @@ export class Ghost {
   @UpdateDateColumn()
   updateDate: Date;
 
-  constructor(id: number, gene: string, level: number, userId: string) {
-    this.id = id;
+  constructor(gene: string, level: number, userId: string) {
     this.gene = gene;
     this.level = level;
+    this.userId = userId;
+  }
+
+  public setLevel(level: number) {
+    this.level = level;
+  }
+
+  public setUserId(userId: string) {
     this.userId = userId;
   }
 }

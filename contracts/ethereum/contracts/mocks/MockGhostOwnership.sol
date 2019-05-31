@@ -4,9 +4,9 @@ import "../GhostOwnership.sol";
 
 contract MockGhostOwnership is GhostOwnership {
 
-    constructor (address _ceoAddress) public GhostOwnership(_ceoAddress){}
+    constructor (address payable _ceoAddress) public GhostOwnership(_ceoAddress){}
 
-    function createEgg(uint256 _gene, address _owner) external {
+    function createEgg(uint64 _gene, address _owner) external {
         _createEgg(_gene, _owner);
     }
 
