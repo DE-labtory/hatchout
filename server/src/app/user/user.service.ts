@@ -1,5 +1,5 @@
 import {User} from '../../domain/user/user.entity';
-import {UserDto} from '../../domain/user/dto/user.dto';
+import {UserDto} from './dto/user.dto';
 import {DeleteResult} from 'typeorm';
 
 export interface UserService {

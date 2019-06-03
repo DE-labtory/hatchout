@@ -1,4 +1,4 @@
-export class SignUpPayload {
+export class SignUpDto {
 
     data: {
         address: string,
