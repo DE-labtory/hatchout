@@ -38,6 +38,7 @@
     "@types/jest": "^23.3.13",
     "@types/node": "^10.12.18",
     "@types/supertest": "^2.0.7",
+    "husky": "^2.3.0",
     "jest": "^23.6.0",
     "nodemon": "^1.18.9",
     "prettier": "^1.15.3",
@@ -65,7 +66,8 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "tslint --fix -c ./tslint.json 'src/**/*{.ts,.tsx}'"
+      "pre-commit": "tslint --fix -c ./tslint.json -p ./tsconfig.json 'src/**/*{.ts,.tsx}' && npm run lint",
+      "pre-push": "npm run lint && npm run test"
     }
   }
 }
