@@ -3,7 +3,7 @@ import {TransactionService} from '../../app/transaction/transaction.service.impl
 import {Transaction} from '../../domain/transaction/transaction.entity';
 import {TransactionController} from './transaction.contoller';
 import {Test, TestingModule} from '@nestjs/testing';
-import {CreateTransactionRequest} from '../../app/transaction/request/create-transaction.request';
+import {CreateTransactionDto} from '../../app/transaction/dto/create-transaction.dto';
 
 describe('TransactionController', () => {
     const blockHash = '0x0000000000000000000000000000000000000000000000000000000012345678';
@@ -98,10 +98,10 @@ describe('TransactionController', () => {
     });
 
     describe('#create', () => {
-        let transactionDto: CreateTransactionRequest;
+        let transactionDto: CreateTransactionDto;
 
         it('should return created transaction', async () => {
-            transactionDto = new CreateTransactionRequest(
+            transactionDto = new CreateTransactionDto(
                 blockHash,
                 blockNumber,
                 txHash,
@@ -120,7 +120,7 @@ describe('TransactionController', () => {
         });
 
         it('should throw "txHash should be defined"', async () => {
-            transactionDto = new CreateTransactionRequest();
+            transactionDto = new CreateTransactionDto();
             when(mockService.create(transactionDto))
                 .thenReject()
                 .thenThrow(new Error('txHash should be defined'));
@@ -132,7 +132,7 @@ describe('TransactionController', () => {
         });
 
         it('should throw "txHash is already registered"', async () => {
-            transactionDto = new CreateTransactionRequest(
+            transactionDto = new CreateTransactionDto(
                 blockHash,
                 blockNumber,
                 txHash,

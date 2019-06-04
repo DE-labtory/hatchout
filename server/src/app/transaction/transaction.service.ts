@@ -1,8 +1,8 @@
 import {Transaction} from '../../domain/transaction/transaction.entity';
-import {CreateTransactionRequest} from './request/create-transaction.request';
+import {CreateTransactionDto} from './dto/create-transaction.dto';
 
 export interface ITransactionService {
-    create(newTransactionRequest: CreateTransactionRequest): Promise<Transaction>;
+    create(newTransactionRequest: CreateTransactionDto): Promise<Transaction>;
     get(txHash: string): Promise<Transaction>;
     getAll(page: number): Promise<Transaction[]>;
 }

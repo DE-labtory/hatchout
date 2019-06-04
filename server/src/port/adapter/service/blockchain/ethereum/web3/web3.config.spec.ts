@@ -5,7 +5,6 @@ import { ConfigModule } from 'nestjs-config';
 
 describe('Web3provider', () => {
   let config: Web3Config;
-  afterAll(() => setTimeout(() => process.exit(), 1000));
   it('should load http provided web3d', async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [Web3Config],

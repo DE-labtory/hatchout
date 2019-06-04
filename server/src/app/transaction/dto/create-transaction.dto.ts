@@ -1,4 +1,4 @@
-export class CreateTransactionRequest {
+export class CreateTransactionDto {
     readonly blockHash: string;
     readonly blockNumber: number;
     readonly txHash: string;
