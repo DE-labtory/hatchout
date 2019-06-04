@@ -1,9 +1,9 @@
 import {TransactionRepository} from '../../port/persistence/repository/transaction.repository.impl';
-import {mock, instance, when, anything, anyNumber} from 'ts-mockito';
+import {mock, instance, when, anything} from 'ts-mockito';
 import {TransactionService} from './transaction.service.impl';
 import {Test, TestingModule} from '@nestjs/testing';
 import {Transaction} from '../../domain/transaction/transaction.entity';
-import {CreateTransactionRequest} from './request/create-transaction.request';
+import {CreateTransactionDto} from './dto/create-transaction.dto';
 
 describe('TransactionService', async () => {
     const blockHash = '0x0000000000000000000000000000000000000000000000000000000012345678';
@@ -50,7 +50,7 @@ describe('TransactionService', async () => {
     });
 
     describe('#create()', () => {
-        let createTransactionRequest: CreateTransactionRequest;
+        let createTransactionDto: CreateTransactionDto;
 
         it('should return created transaction', async () => {
             when(mockRepository.findOne(txHash)).thenReturn(undefined);
@@ -58,7 +58,7 @@ describe('TransactionService', async () => {
                 resolve(transaction);
             }));
             service = new TransactionService(instance(mockRepository));
-            createTransactionRequest = new CreateTransactionRequest(
+            createTransactionDto = new CreateTransactionDto(
                 blockHash,
                 blockNumber,
                 txHash,
@@ -69,14 +69,14 @@ describe('TransactionService', async () => {
                 status,
             );
 
-            expect(await service.create(createTransactionRequest)).toBe(transaction);
+            expect(await service.create(createTransactionDto)).toBe(transaction);
         });
 
         it('should throw "txHash should defined"', async () => {
             service = new TransactionService(instance(mockRepository));
-            createTransactionRequest = new CreateTransactionRequest();
+            createTransactionDto = new CreateTransactionDto();
 
-            await expect(service.create(createTransactionRequest))
+            await expect(service.create(createTransactionDto))
                 .rejects
                 .toThrowError('txHash should be defined');
         });
@@ -86,7 +86,7 @@ describe('TransactionService', async () => {
                 resolve(transaction);
             }));
             service = new TransactionService(instance(mockRepository));
-            createTransactionRequest = new CreateTransactionRequest(
+            createTransactionDto = new CreateTransactionDto(
                 blockHash,
                 blockNumber,
                 txHash,
@@ -98,7 +98,7 @@ describe('TransactionService', async () => {
             );
 
             // then
-            await expect(service.create(createTransactionRequest))
+            await expect(service.create(createTransactionDto))
                 .rejects
                 .toThrowError('txHash is already registered');
         });

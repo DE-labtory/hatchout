@@ -1,14 +1,14 @@
 import {ITransactionService} from './transaction.service';
 import {Inject, Injectable} from '@nestjs/common';
 import {Transaction} from '../../domain/transaction/transaction.entity';
-import {ITransactionRepository} from '../../port/persistence/repository/transaction.repository';
-import {CreateTransactionRequest} from './request/create-transaction.request';
+import {CreateTransactionDto} from './dto/create-transaction.dto';
+import {ITransactionRepository} from '../../domain/transaction/transaction.repository';
 
 @Injectable()
 export class TransactionService implements ITransactionService {
     constructor(@Inject('ITransactionRepository') private TransactionRepository: ITransactionRepository) {}
 
-    async create(newTransactionRequest: CreateTransactionRequest): Promise<Transaction> {
+    async create(newTransactionRequest: CreateTransactionDto): Promise<Transaction> {
         const newTxHash = newTransactionRequest.txHash;
 
         if (newTxHash === undefined) {

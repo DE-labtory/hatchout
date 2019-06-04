@@ -1,6 +1,5 @@
 import {DeleteResult} from 'typeorm';
-import {User} from '../../../domain/user/user.entity';
-import {Ghost} from '../../../domain/ghost/ghost.entity';
+import {User} from './user.entity';
 
 export interface IUserRepository {
     save(entity: User): Promise<User>;
