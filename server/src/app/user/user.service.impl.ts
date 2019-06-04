@@ -12,7 +12,7 @@ export class UserServiceImpl implements UserService {
     async get(id: number): Promise<User> {
         return await this.userRepository.findById(id);
     }
-    
+
     async create(userDto: UserDto): Promise<User> {
         if (userDto.address === undefined) {
             throw new Error('address should be defined');
@@ -28,11 +28,11 @@ export class UserServiceImpl implements UserService {
         const user = new User(userDto.address, userDto.name);
         return await this.userRepository.save(user);
     }
-    
+
     async delete(id: number): Promise<DeleteResult> {
         return await this.userRepository.delete(id);
     }
-    
+
     async increasePoint(id: number, amount: number): Promise<User> {
         let user: User;
         user = await this.userRepository.findById(id);
@@ -42,7 +42,7 @@ export class UserServiceImpl implements UserService {
 
         return user.increasePoint(amount);
     }
-    
+
     async decreasePoint(id: number, amount: number): Promise<User> {
         let user: User;
         user = await this.userRepository.findById(id);
