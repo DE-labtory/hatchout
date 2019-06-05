@@ -47,6 +47,7 @@
     "printWidth": 80
   },
   "dependencies": {
+    "chai": "^4.2.0",
     "package.json": "^2.0.1"
   }
 }
