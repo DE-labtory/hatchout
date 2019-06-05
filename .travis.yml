@@ -12,12 +12,12 @@ node_js:
   - '10'
 
 before_install:
-  - cd server
   - npm update
 
 install:
-  - npm install
+  - npm install --prefix ./server/
+  - npm install --prefix ./contracts/ethereum/
 
 script:
-  - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then bash ../travis/run_on_pull_requests.sh; fi'
-  - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then bash ../travis/run_on_non_pull_requests.sh; fi'
+  - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then bash ./travis/run_on_pull_requests.sh; fi'
+  - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then bash ./travis/run_on_non_pull_requests.sh; fi'
