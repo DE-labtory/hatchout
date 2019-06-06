@@ -1,10 +1,10 @@
-import {Injectable} from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import {IGhostRepository} from '../../domain/ghost/ghost.repository';
 import {Ghost} from '../../domain/ghost/ghost.entity';
 
 @Injectable()
 export class GhostService {
-  constructor(private readonly ghostRepository: IGhostRepository) {
+  constructor(@Inject('IGhostRepository') private readonly ghostRepository: IGhostRepository) {
   }
 
   async findOne(id: number): Promise<Ghost> {

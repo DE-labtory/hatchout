@@ -1,6 +1,5 @@
 import {Inject, Injectable} from '@nestjs/common';
 import {UserService} from './user.service';
-import {UserDto} from '../../domain/user/dto/user.dto';
 import {User} from '../../domain/user/user.entity';
 import {DeleteResult} from 'typeorm';
 import {IUserRepository} from '../../domain/user/user.repository';
@@ -9,23 +8,27 @@ import {IUserRepository} from '../../domain/user/user.repository';
 export class UserServiceImpl implements UserService {
     constructor(@Inject('IUserRepository') private userRepository: IUserRepository) {}
 
+    async getByAddress(address: string): Promise<User> {
+        return await this.userRepository.findByAddress(address);
+    }
+
     async get(id: number): Promise<User> {
         return await this.userRepository.findById(id);
     }
 
-    async create(userDto: UserDto): Promise<User> {
-        if (userDto.address === undefined) {
+    async create(address: string, name: string): Promise<User> {
+        if (address === undefined) {
             throw new Error('address should be defined');
         }
-        if (userDto.name === undefined) {
+        if (name === undefined) {
             throw new Error('name should be defined');
         }
-        const userRetrieved = await this.userRepository.findByAddress(userDto.address);
+        const userRetrieved = await this.userRepository.findByAddress(address);
         if (userRetrieved !== undefined) {
             throw new Error('address is already registered');
         }
 
-        const user = new User(userDto.address, userDto.name);
+        const user = new User(address, name);
         return await this.userRepository.save(user);
     }
 

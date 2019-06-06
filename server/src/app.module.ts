@@ -4,9 +4,10 @@ import { AppService } from './app.service';
 import { ConfigModule } from 'nestjs-config';
 import { GhostService } from './app/ghost/ghost.service';
 import { GhostModule } from './port/module/ghost.module';
-import * as path from 'path';
 import {UserModule} from './port/module/user.module';
-import { AuthModule } from './port/module/auth.module';
+import { AuthModule } from './port/module/auth.module';;
+import * as path from 'path';
+import { GhostRepository } from './port/persistence/repository/ghost.repository.impl';
 
 @Module({
   imports: [
@@ -16,6 +17,8 @@ import { AuthModule } from './port/module/auth.module';
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService, GhostService],
+  providers: [AppService, GhostService,
+    {provide: 'IGhostRepository', useClass: GhostRepository},
+  ],
 })
 export class AppModule {}
