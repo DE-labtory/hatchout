@@ -22,7 +22,7 @@ describe('UserServiceImpl', () => {
                 providers: [
                     UserServiceImpl,
                     {
-                        provide: 'IUserRepository',
+                        provide: 'UserRepository',
                         useValue: instance(mockRepository),
                     },
                 ],

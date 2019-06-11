@@ -1,13 +1,14 @@
-import {Inject, Injectable} from '@nestjs/common';
+import {Injectable} from '@nestjs/common';
 import {UserService} from './user.service';
 import {UserDto} from '../../domain/user/dto/user.dto';
 import {User} from '../../domain/user/user.entity';
 import {DeleteResult} from 'typeorm';
 import {IUserRepository} from '../../domain/user/user.repository';
+import {InjectRepository} from '@nestjs/typeorm';
 
 @Injectable()
 export class UserServiceImpl implements UserService {
-    constructor(@Inject('IUserRepository') private userRepository: IUserRepository) {}
+    constructor(@InjectRepository(User) private userRepository: IUserRepository) {}
 
     async get(id: number): Promise<User> {
         return await this.userRepository.findById(id);

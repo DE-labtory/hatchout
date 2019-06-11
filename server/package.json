@@ -27,6 +27,7 @@
     "class-validator": "^0.9.1",
     "nestjs-config": "^1.4.0",
     "nestjs-typeorm-paginate": "^0.1.7",
+    "pg": "^7.11.0",
     "reflect-metadata": "^0.1.12",
     "rimraf": "^2.6.2",
     "rxjs": "^6.3.3",
