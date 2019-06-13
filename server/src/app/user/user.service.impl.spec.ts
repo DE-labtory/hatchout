@@ -67,7 +67,7 @@ describe('UserServiceImpl', () => {
             service = new UserServiceImpl(instance(mockRepository));
             userDto = new UserDto(address, name);
 
-            expect(await service.create(userDto)).toBe(user);
+            expect(await service.create(address, name)).toBe(user);
         });
         it('should throw InvalidParameterException', async () => {
             when(mockRepository.findByAddress(address)).thenReturn(
@@ -77,7 +77,7 @@ describe('UserServiceImpl', () => {
             service = new UserServiceImpl(instance(mockRepository));
             userDto = new UserDto();
 
-            await expect(service.create(userDto))
+            await expect(service.create(address, name))
                 .rejects
                 .toThrowError(InvalidParameterException);
         });
@@ -89,7 +89,7 @@ describe('UserServiceImpl', () => {
             service = new UserServiceImpl(instance(mockRepository));
             userDto = new UserDto(address);
 
-            await expect(service.create(userDto))
+            await expect(service.create(address, name))
                 .rejects
                 .toThrowError(InvalidParameterException);
         });
@@ -101,7 +101,7 @@ describe('UserServiceImpl', () => {
             service = new UserServiceImpl(instance(mockRepository));
             userDto = new UserDto(address, name);
 
-            await expect(service.create(userDto))
+            await expect(service.create(address, name))
                 .rejects
                 .toThrowError(NotAcceptableException);
         });

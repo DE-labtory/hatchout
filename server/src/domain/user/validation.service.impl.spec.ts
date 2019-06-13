@@ -5,6 +5,7 @@ import {BridgeService} from './bridge.service';
 import {Web3Module} from '../../port/adapter/service/blockchain/ethereum/web3/web3.module';
 import {ConfigModule} from 'nestjs-config';
 import * as path from 'path';
+import { Web3BridgeService } from '../../port/adapter/service/blockchain/ethereum/web3/web3.bridge.service';
 
 describe('ValidationServiceImpl', () => {
 
@@ -13,7 +14,7 @@ describe('ValidationServiceImpl', () => {
             return '';
         }
     }
-    const mockBridgeService = mock(BrideServiceImpl);
+    const mockBridgeService = mock(Web3BridgeService);
     let service: ValidationServiceImpl;
 
     describe('dependency resolve', () => {
@@ -43,7 +44,7 @@ describe('ValidationServiceImpl', () => {
             when(mockBridgeService.recover(message, signature)).thenReturn(address);
 
             service = new ValidationServiceImpl(instance(mockBridgeService));
-            expect(service.verify(data, signature)).toBeTruthy();
+            expect(service.verify(address, message, signature)).toBeTruthy();
         });
         it('should return false', () => {
             message = 'wrongData';
@@ -53,7 +54,7 @@ describe('ValidationServiceImpl', () => {
             when(mockBridgeService.recover(message, signature)).thenReturn(wrongAddress);
 
             service = new ValidationServiceImpl(instance(mockBridgeService));
-            expect(service.verify(data, signature)).toBeFalsy();
+            expect(service.verify(address, message, signature)).toBeFalsy();
         });
 
     });
