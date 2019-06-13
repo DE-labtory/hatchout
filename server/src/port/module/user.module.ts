@@ -15,6 +15,12 @@ import {UserRepository} from '../persistence/repository/user.repository.impl';
             useClass: UserServiceImpl,
         },
     ],
+  exports: [
+    {
+      provide: 'UserService',
+      useClass: UserServiceImpl,
+    },
+  ],
 })
 export class UserModule {
 

@@ -1,3 +1,3 @@
 export interface BridgeService {
-    recover(message: string, signature: string): string;
+  recover(message: string, signature: string): string;
 }

@@ -8,6 +8,7 @@ import {UserModule} from './port/module/user.module';
 import {ItemModule} from './port/module/item.module';
 import {TransactionModule} from './port/module/transaction.module';
 import {DatabaseModule} from './port/module/database.module';
+import { AuthModule } from './port/module/auth.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import {DatabaseModule} from './port/module/database.module';
     TransactionModule,
     UserModule,
     DatabaseModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
