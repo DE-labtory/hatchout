@@ -1,13 +1,14 @@
 import {Inject, Injectable} from '@nestjs/common';
-import {BridgeService} from './bridge.service';
 import {ValidationService} from './validation.service';
+import {BridgeService} from './bridge.service';
 
 @Injectable()
 export class ValidationServiceImpl implements ValidationService {
 
-    constructor(@Inject('BridgeService') private bridgeService: BridgeService) {}
+  constructor(@Inject('BridgeService') private bridgeService: BridgeService) {
+  }
 
-    public verify(data: {address: string, message: string}, signature: string): boolean {
-        return data.address === this.bridgeService.recover(data.message, signature);
-    }
+  public verify(address: string, message: string, signature: string): boolean {
+    return address === this.bridgeService.recover(message, signature);
+  }
 }

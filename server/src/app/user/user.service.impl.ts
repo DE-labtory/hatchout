@@ -3,13 +3,16 @@ import {UserService} from './user.service';
 import {User} from '../../domain/user/user.entity';
 import {DeleteResult} from 'typeorm';
 import {InjectRepository} from '@nestjs/typeorm';
-import {UserDto} from './dto/user.dto';
 import {InvalidParameterException} from '../../domain/exception/InvalidParameterException';
 import {IUserRepository} from '../../domain/user/user.repository';
 
 @Injectable()
 export class UserServiceImpl implements UserService {
     constructor(@InjectRepository(User) private userRepository: IUserRepository) {}
+
+    async getByAddress(address: string): Promise<User> {
+        return await this.userRepository.findByAddress(address);
+    }
 
     async get(id: number): Promise<User> {
         const user = await this.userRepository.findById(id);
@@ -19,19 +22,19 @@ export class UserServiceImpl implements UserService {
         return user;
     }
 
-    async create(userDto: UserDto): Promise<User> {
-        if (userDto.address === undefined) {
+    async create(address: string, name: string): Promise<User> {
+        if (address === undefined) {
             throw new InvalidParameterException('address should be defined');
         }
-        if (userDto.name === undefined) {
+        if (name === undefined) {
             throw new InvalidParameterException('name should be defined');
         }
-        const userRetrieved = await this.userRepository.findByAddress(userDto.address);
+        const userRetrieved = await this.userRepository.findByAddress(address);
         if (userRetrieved !== undefined) {
             throw new NotAcceptableException('address is already registered');
         }
 
-        const user = new User(userDto.address, userDto.name);
+        const user = new User(address, name);
         return await this.userRepository.save(user);
     }
 
@@ -47,7 +50,6 @@ export class UserServiceImpl implements UserService {
 
         return user.increasePoint(amount);
     }
-
     async decreasePoint(id: number, amount: number): Promise<User> {
         const user = await this.userRepository.findById(id);
         if (user === undefined) {
