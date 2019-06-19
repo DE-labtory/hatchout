@@ -1,5 +1,3 @@
-import {Data} from './data';
-
 export interface ValidationService {
-    verify(data: Data, signature: string): boolean;
+    verify(data: {address: string, message: string}, signature: string): boolean;
 }
