@@ -1,6 +1,6 @@
 import {User} from '../../domain/user/user.entity';
-import {UserDto} from '../../domain/user/dto/user.dto';
 import {DeleteResult} from 'typeorm';
+import {UserDto} from './dto/user.dto';
 
 export interface UserService {
     get(id: number): Promise<User>;
