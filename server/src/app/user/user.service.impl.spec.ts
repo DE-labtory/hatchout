@@ -3,7 +3,7 @@ import {anything, instance, mock, when} from 'ts-mockito';
 import {TestingModule, Test} from '@nestjs/testing';
 import {User} from '../../domain/user/user.entity';
 import {UserRepository} from '../../port/persistence/repository/user.repository.impl';
-import {BadRequestException, NotAcceptableException, NotFoundException} from '@nestjs/common';
+import {NotAcceptableException, NotFoundException} from '@nestjs/common';
 import {UserDto} from './dto/user.dto';
 import {ValidationException} from '../../domain/exception/ValidationException';
 import {InvalidParameterException} from '../../domain/exception/InvalidParameterException';
@@ -47,13 +47,13 @@ describe('UserServiceImpl', () => {
 
             expect(await service.get(id)).toBe(user);
         });
-        it('should throw BadRequestException', async () => {
+        it('should throw NotFoundException', async () => {
             when(mockRepository.findById(null)).thenReturn(undefined);
             service = new UserServiceImpl(instance(mockRepository));
 
             await expect(service.get(null))
                 .rejects
-                .toThrowError(BadRequestException);
+                .toThrowError(NotFoundException);
         });
     });
     describe('#create()', () => {
@@ -125,31 +125,41 @@ describe('UserServiceImpl', () => {
     });
     describe('#increasePoint()', () => {
         const id = 1;
-        const amount = 10;
+        const validAmount = 10;
+        const invalidAmount = -1;
 
         it('should return user with increased point', async () => {
             when(mockRepository.findById(id)).thenReturn(new Promise((resolve => resolve(user))));
             service = new UserServiceImpl(instance(mockRepository));
 
-            const userReturned = await service.increasePoint(id, amount);
+            const userReturned = await service.increasePoint(id, validAmount);
 
             expect(userReturned).toBeDefined();
-            expect(userReturned.getPoint()).toBe(amount);
+            expect(userReturned.getPoint()).toBe(validAmount);
         });
         it('should throw error NotFoundException', async () => {
             when(mockRepository.findById(id)).thenReturn(undefined);
             service = new UserServiceImpl(instance(mockRepository));
 
-            await expect(service.increasePoint(id, amount))
+            await expect(service.increasePoint(id, validAmount))
                 .rejects
                 .toThrowError(NotFoundException);
+        });
+        it('should throw ValidationException when amount is negative', async () => {
+            when(mockRepository.findById(id)).thenReturn(new Promise((resolve => resolve(user))));
+            service = new UserServiceImpl(instance(mockRepository));
+
+            await expect(service.increasePoint(id, invalidAmount))
+                .rejects
+                .toThrowError(ValidationException);
+
         });
     });
     describe('#decreasePoint()', () => {
         const id = 1;
         const point = 100;
         const validAmount = 10;
-        const invalidAmount = 1000;
+        let invalidAmount: number;
 
         it('should return user with increased level', async () => {
             user = new User(address, name, point);
@@ -169,7 +179,18 @@ describe('UserServiceImpl', () => {
                 .rejects
                 .toThrowError(NotFoundException);
         });
-        it('should throw error ValidationException', async () => {
+        it('should throw ValidationException when amount is negative', async () => {
+            invalidAmount = -1;
+            user = new User(address, name, point);
+            when(mockRepository.findById(id)).thenReturn(new Promise((resolve => resolve(user))));
+            service = new UserServiceImpl(instance(mockRepository));
+
+            await expect(service.decreasePoint(id, invalidAmount))
+                .rejects
+                .toThrowError(ValidationException);
+        });
+        it('should throw ValidationException when point becomes less than MIN_POINT', async () => {
+            invalidAmount = 1000;
             user = new User(address, name, point);
             when(mockRepository.findById(id)).thenReturn(new Promise((resolve => resolve(user))));
             service = new UserServiceImpl(instance(mockRepository));
@@ -182,7 +203,7 @@ describe('UserServiceImpl', () => {
     describe('#increaseLevel()', () => {
         const id = 1;
         const validAmount = 10;
-        const invalidAmount = 1000;
+        let invalidAmount: number;
 
         it('should return user with increased level', async () => {
             when(mockRepository.findById(id)).thenReturn(new Promise((resolve => resolve(user))));
@@ -201,7 +222,17 @@ describe('UserServiceImpl', () => {
                 .rejects
                 .toThrowError(NotFoundException);
         });
-        it('should throw error ValidationException', async () => {
+        it('should throw ValidationException when amount is negative', async () => {
+            invalidAmount = -1;
+            when(mockRepository.findById(id)).thenReturn(new Promise((resolve => resolve(user))));
+            service = new UserServiceImpl(instance(mockRepository));
+
+            await expect(service.increaseLevel(id, invalidAmount))
+                .rejects
+                .toThrowError(ValidationException);
+        });
+        it('should throw ValidationException when level becomes more than MAX_LEVEL', async () => {
+            invalidAmount = 1000;
             when(mockRepository.findById(id)).thenReturn(new Promise((resolve => resolve(user))));
             service = new UserServiceImpl(instance(mockRepository));
 

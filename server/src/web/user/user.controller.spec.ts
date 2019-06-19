@@ -5,7 +5,7 @@ import {UserService} from '../../app/user/user.service';
 import {UserServiceImpl} from '../../app/user/user.service.impl';
 import {User} from '../../domain/user/user.entity';
 import {UserDto} from '../../app/user/dto/user.dto';
-import {BadRequestException, NotAcceptableException, NotFoundException} from '@nestjs/common';
+import {NotAcceptableException, NotFoundException} from '@nestjs/common';
 import {InvalidParameterException} from '../../domain/exception/InvalidParameterException';
 import {ValidationException} from '../../domain/exception/ValidationException';
 
@@ -50,13 +50,13 @@ describe('User Controller', () => {
             expect(await controller.get(id)).toBe(user);
 
         });
-        it('should return undefined', async () => {
-            when(mockUserService.get(id)).thenThrow(new BadRequestException('no user with the id'));
+        it('should throw NotFoundException', async () => {
+            when(mockUserService.get(id)).thenThrow(new NotFoundException('user with the id is not found'));
             controller = new UserController(instance(mockUserService));
 
             await expect(controller.get(id))
                 .rejects
-                .toThrowError(BadRequestException);
+                .toThrowError(NotFoundException);
         });
     });
     describe('#create()', () => {

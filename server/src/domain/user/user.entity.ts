@@ -55,21 +55,31 @@ export class User {
     public getLevel(): number {
         return this.level;
     }
-    public increasePoint(amount: number): User {
+    public async increasePoint(amount: number): Promise<User> {
+        if (amount < 0) {
+            throw new ValidationException('amount should be positive');
+        }
+
         this.point += amount;
         return this;
     }
     public async decreasePoint(amount: number): Promise<User> {
+        if (amount < 0) {
+            throw new ValidationException('amount should be positive');
+        }
         if (this.point - amount < MIN_POINT) {
-            throw new ValidationException('can not decrease point');
+            throw new ValidationException('can not decrease point under MIN_POINT');
         }
 
         this.point -= amount;
         return this;
     }
     public async increaseLevel(amount: number): Promise<User> {
+        if (amount < 0) {
+            throw new ValidationException('amount should be positive');
+        }
         if (MAX_LEVEL < this.level + amount) {
-            throw new ValidationException('can not increase level');
+            throw new ValidationException('can not increase level over MAX_LEVEL');
         }
 
         this.level += amount;

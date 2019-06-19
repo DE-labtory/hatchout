@@ -14,7 +14,7 @@ export class UserServiceImpl implements UserService {
     async get(id: number): Promise<User> {
         const user = await this.userRepository.findById(id);
         if (user === undefined) {
-            throw new BadRequestException('no user with the id');
+            throw new NotFoundException('user with the id is not found');
         }
         return user;
     }
