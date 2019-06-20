@@ -3,20 +3,23 @@ import {
     IndexState,
     Block,
     NextBlock,
-    VersionedAction,
-} from 'demux';
-import * as State from '../types/types';
+    VersionedAction
+} from "demux";
+import { State } from "../types/types";
 
 export class ObjectActionHandler extends AbstractActionHandler {
     constructor([handleVersion]: any, stopAt: number) {
         super([handleVersion]);
         this.stopAt = stopAt;
-        this.state.indexState = {
-            blockNumber: 0,
-            blockHash: '',
-            isReplay: false,
-            handlerVersionName: 'v1',
-        };
+        this.state = {
+            trx_id: "",
+            indexState: {
+                blockNumber: 0,
+                blockHash: "",
+                isReplay: false,
+                handlerVersionName: "v1"
+            }
+        }
     }
     public stopService = (blockNumber: number) => {
         // Function stop the service when meet the stopAt block number
@@ -25,10 +28,10 @@ export class ObjectActionHandler extends AbstractActionHandler {
             // console.log('####################\n');
             process.exit(1);
         }
-    }
+    };
 
-    public state: any;
-    private hashHistory: { [key: number]: string } = { 0: '' };
+    private state: State;
+    private hashHistory: { [key: number]: string } = { 0: "" };
     private stopAt: number;
 
     get _handlerVersionName() {
@@ -40,7 +43,7 @@ export class ObjectActionHandler extends AbstractActionHandler {
         try {
             await handle(this.state);
         } catch (err) {
-            throw new Error('handle state err');
+            throw new Error("handle state err");
         }
     }
 
@@ -50,7 +53,7 @@ export class ObjectActionHandler extends AbstractActionHandler {
         this.state.indexState = {
             ...this.state.indexState,
             blockNumber,
-            blockHash: this.hashHistory[blockNumber],
+            blockHash: this.hashHistory[blockNumber]
         };
     }
 
@@ -66,7 +69,7 @@ export class ObjectActionHandler extends AbstractActionHandler {
         state: any,
         block: Block,
         context: any,
-        isReplay: boolean,
+        isReplay: boolean
     ): Promise<VersionedAction[]> {
         return this.applyUpdaters(state, block, context, isReplay);
     }
@@ -74,7 +77,7 @@ export class ObjectActionHandler extends AbstractActionHandler {
     public _runEffects(
         versionedActions: VersionedAction[],
         context: any,
-        nextBlock: NextBlock,
+        nextBlock: NextBlock
     ) {
         this.runEffects(versionedActions, context, nextBlock);
     }
@@ -85,7 +88,7 @@ export class ObjectActionHandler extends AbstractActionHandler {
 
     public async handleBlock(
         nextBlock: NextBlock,
-        isReplay: boolean,
+        isReplay: boolean
     ): Promise<number | null> {
         const { blockNumber, blockHash } = nextBlock.block.blockInfo;
         this.hashHistory[blockNumber] = blockHash;
@@ -96,7 +99,7 @@ export class ObjectActionHandler extends AbstractActionHandler {
         state: any,
         block: Block,
         isReplay: boolean,
-        handlerVersionName: string,
+        handlerVersionName: string
     ) {
         // console.log("Processing block: ", block.blockInfo.blockNumber);
         const { blockNumber, blockHash } = block.blockInfo;
@@ -105,7 +108,7 @@ export class ObjectActionHandler extends AbstractActionHandler {
             blockNumber,
             blockHash,
             isReplay,
-            handlerVersionName,
+            handlerVersionName
         };
         if (this.stopAt) {
             this.stopService(blockNumber);

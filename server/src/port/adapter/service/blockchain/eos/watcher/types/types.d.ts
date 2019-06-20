@@ -1,6 +1,4 @@
-export interface CreateEggState {
-    gene: string;
-    owner: string;
+export interface State {
     trx_id: string;
     indexState: {
         blockNumber: number;
@@ -9,65 +7,34 @@ export interface CreateEggState {
         handlerVersionName: string;
     };
 }
-export interface SendState {
+export interface CreateEggState extends State {
+    gene: string;
+    owner: string;
+}
+export interface SendState extends State {
     from: string;
     to: string;
     gene: string;
-    trx_id: string;
-    indexState: {
-        blockNumber: number;
-        blockHash: string;
-        isReplay: boolean;
-        handlerVersionName: string;
-    };
 }
-export interface LevelUpState {
+export interface LevelUpState extends State {
     owner: string;
     gene: string;
     level: number;
-    trx_id: string;
-    indexState: {
-        blockNumber: number;
-        blockHash: string;
-        isReplay: boolean;
-        handlerVersionName: string;
-    };
 }
-export interface AuctionState {
+export interface AuctionState extends State {
     auctioneer: string;
     gene: string;
     minPrice: number;
     deadline: number;
-    trx_id: string;
-    indexState: {
-        blockNumber: number;
-        blockHash: string;
-        isReplay: boolean;
-        handlerVersionName: string;
-    };
 }
-export interface BidState {
+export interface BidState extends State {
     bidder: string;
     gene: string;
     bid: number;
-    trx_id: string;
-    indexState: {
-        blockNumber: number;
-        blockHash: string;
-        isReplay: boolean;
-        handlerVersionName: string;
-    };
 }
-export interface ClaimState {
+export interface ClaimState extends State {
     requester: string;
     gene: string;
-    trx_id: string;
-    indexState: {
-        blockNumber: number;
-        blockHash: string;
-        isReplay: boolean;
-        handlerVersionName: string;
-    };
 }
 export interface NodeosActionReaderOptions extends ActionReaderOptions {
     nodeosEndpoint?: string;
