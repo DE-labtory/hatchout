@@ -268,10 +268,10 @@ ACTION ghost::close( name owner, const symbol& symbol ) {
     acnts.erase( existing_ac );
 }
 
-ACTION ghost::issuenft( name to, uint64_t token_id, name token_name, asset value, const signature &sig, string memo ) {
+ACTION ghost::createegg( name to, id_type gene, name token_name, const signature &sig, string memo ) {
     require_auth(to);
 
-    string data = to.to_string() + uint64_to_string(token_id) + token_name.to_string() + value.to_string();
+    string data = to.to_string() + uint64_to_string(gene) + token_name.to_string();
     const checksum256 digest = sha256(&data[0], data.size());
     assert_recover_key( digest, sig, _info_state.pub_key );
 
@@ -284,22 +284,39 @@ ACTION ghost::issuenft( name to, uint64_t token_id, name token_name, asset value
 
     _info_state.ghost_supply += unit;
 
-    tokens tokenstable( _self, sym.code().raw() );
+    ghosts ghoststable( _self, sym.code().raw() );
 
-    auto existing_tk = tokenstable.find( token_id );
-    check( existing_tk == tokenstable.end(), "token with symbol already exists" );
-    tokenstable.emplace( to, [&]( auto& token ) {
-        token.token_id  = token_id;
-        token.owner     = to;
-        token.value     = value;
-        token.tokenName = token_name;
-        token.spender   = to;
+    auto existing_ghost = ghoststable.find( gene );
+    check( existing_ghost == ghoststable.end(), "ghost already exists" );
+    ghoststable.emplace( to, [&]( auto& ghost ) {
+        ghost.gene      = gene;
+        ghost.owner     = to;
+        ghost.tokenName = token_name;
+        ghost.level     = 0;
+        ghost.spender   = to;
     });
 
     add_balance( to, unit, to );
 }
 
-ACTION ghost::burnnft( name owner, vector<uint64_t> token_ids, string memo ) {
+ACTION ghost::levelup( name owner, id_type gene, uint8_t level, const signature &sig ) {
+    require_auth( owner );
+
+    string data = owner.to_string() + uint64_to_string(gene) + std::to_string(level);
+    const checksum256 digest = sha256(&data[0], data.size());
+    assert_recover_key( digest, sig, _info_state.pub_key );
+
+    auto existing_ghost = ghoststable.find( gene );
+    check( existing_ghost != ghoststable.end(), "ghost not exist" );
+
+    check( existing_ghost->level < level, "the ghost level must be less than level" );
+    
+    ghoststable.modify( existing_ghost, same_payer, [&]( auto& ghost ) {
+        ghost.level = level;
+    });
+}
+
+ACTION ghost::burnnft( name owner, vector<id_type> genes, string memo ) {
     require_auth( owner );
 
     auto sym = _info_state.ghost_supply.symbol;
@@ -307,15 +324,15 @@ ACTION ghost::burnnft( name owner, vector<uint64_t> token_ids, string memo ) {
 
     check( memo.size() <= 256, "memo has more than 256 bytes" );
 
-    asset unit( token_ids.size(), sym );
-    check( unit.amount, "enter token id" );
+    asset unit( genes.size(), sym );
+    check( unit.amount, "enter genes" );
 
-    tokens tokenstable( _self, sym.code().raw() );
-    for( auto const& token_id : token_ids ) {
-        auto existing_tk = tokenstable.find( token_id );
-        check( existing_tk != tokenstable.end(), "token with symbol does not exists" );
-        check( existing_tk->owner == owner, "not the owner of token" );
-        tokenstable.erase( existing_tk );
+    ghosts ghoststable( _self, sym.code().raw() );
+    for( auto const& gene : genes ) {
+        auto existing_ghost = ghoststable.find( gene );
+        check( existing_ghost != ghoststable.end(), "ghost does not exists" );
+        check( existing_ghost->owner == owner, "not the owner of ghost" );
+        ghoststable.erase( existing_ghost );
     }
 
     sub_balance( owner, unit );
@@ -323,30 +340,30 @@ ACTION ghost::burnnft( name owner, vector<uint64_t> token_ids, string memo ) {
     _info_state.ghost_supply -= unit;
 }
 
-ACTION ghost::burnnftfrom( name burner, id_type token_id, string memo ) {
+ACTION ghost::burnnftfrom( name burner, id_type gene, string memo ) {
     require_auth( burner );
 
     auto symbol = _info_state.ghost_supply.symbol;
     check( symbol.is_valid(), "invalid symbol name" );
     check( memo.size() <= 256, "memo has more than 256 bytes" );
 
-    tokens tokenstable( _self, symbol.code().raw() );
-    auto existing_tk = tokenstable.find( token_id );
-    check( existing_tk != tokenstable.end(), "token with symbol does not exists" );
+    ghosts ghoststable( _self, symbol.code().raw() );
+    auto existing_ghost = ghoststable.find( gene );
+    check( existing_ghost != ghoststable.end(), "ghost does not exists" );
 
-    require_recipient( existing_tk->owner );
+    require_recipient( existing_ghost->owner );
 
-    check( burner == existing_tk->spender, "burner is not token spender" );
+    check( burner == existing_ghost->spender, "burner is not token spender" );
 
     asset unit( 1, symbol );
 
-    sub_balance( existing_tk->owner, unit );
+    sub_balance( existing_ghost->owner, unit );
 
-    tokenstable.erase( existing_tk );
+    ghoststable.erase( existing_ghost );
     _info_state.ghost_supply -= unit;
 }
 
-ACTION ghost::send( name from, name to, id_type token_id, string memo ) {
+ACTION ghost::send( name from, name to, id_type gene, string memo ) {
     check( from != to, "cannot transfer to self" );
     require_auth( from );
     check( is_account( to ), "to account does not exist" );
@@ -358,17 +375,17 @@ ACTION ghost::send( name from, name to, id_type token_id, string memo ) {
     check( symbol.is_valid(), "invalid symbol name" );
     check( memo.size() <= 256, "memo has more than 256 bytes" );
 
-    tokens tokenstable( _self, symbol.code().raw() );
-    auto existing_tk = tokenstable.find( token_id );
-    check( existing_tk != tokenstable.end(), "token with symbol does not exists" );
-    check( from == existing_tk->owner, "not the owner of token" );
-    check( existing_tk->spender != _self, "if spender is _self, it can not transfer" );
+    ghosts ghoststable( _self, symbol.code().raw() );
+    auto existing_ghost = ghoststable.find( gene );
+    check( existing_ghost != ghoststable.end(), "ghost does not exists" );
+    check( from == existing_ghost->owner, "not the owner of ghost" );
+    check( existing_ghost->spender != _self, "if spender is _self, it can not transfer" );
 
     auto payer = has_auth( to ) ? to : from;
     
-    tokenstable.modify( existing_tk, payer, [&]( auto& token ) {
-        token.owner     = to;
-        token.spender   = to;
+    ghoststable.modify( existing_ghost, payer, [&]( auto& ghost ) {
+        ghost.owner     = to;
+        ghost.spender   = to;
     });
 
     asset unit( 1, symbol );
@@ -377,24 +394,24 @@ ACTION ghost::send( name from, name to, id_type token_id, string memo ) {
     add_balance( to, unit, payer );
 }
 
-ACTION ghost::approvenft( name owner, name spender, id_type token_id ) {
+ACTION ghost::approvenft( name owner, name spender, id_type gene ) {
     require_auth( owner );
 
     auto symbol = _info_state.ghost_supply.symbol;
     check( symbol.is_valid(), "invalid symbol name" );
 
-    tokens tokenstable( _self, symbol.code().raw() );
-    auto existing_tk = tokenstable.find( token_id );
-    check( existing_tk != tokenstable.end(), "token with symbol does not exists" );
-    check( owner == existing_tk->owner, "not the owner of token" );
-    check( owner == _self || existing_tk->spender != _self, "if spender is _self, it can not be changed" );
+    ghosts ghoststable( _self, symbol.code().raw() );
+    auto existing_ghost = ghoststable.find( gene );
+    check( existing_ghost != ghoststable.end(), "ghost does not exists" );
+    check( owner == existing_ghost->owner, "not the owner of ghost" );
+    check( owner == _self || existing_ghost->spender != _self, "if spender is _self, it can not be changed" );
 
-    tokenstable.modify( existing_tk, same_payer, [&]( auto& token ) {
-        token.spender = spender;
+    ghoststable.modify( existing_ghost, same_payer, [&]( auto& ghost ) {
+        ghost.spender = spender;
     });
 }
 
-ACTION ghost::sendfrom( name spender, name to, id_type token_id, string memo ) {
+ACTION ghost::sendfrom( name spender, name to, id_type gene, string memo ) {
     require_auth( spender );
 
     check( is_account( to ), "to account does not exist");
@@ -403,21 +420,21 @@ ACTION ghost::sendfrom( name spender, name to, id_type token_id, string memo ) {
     check( symbol.is_valid(), "invalid symbol name" );
     check( memo.size() <= 256, "memo has more than 256 bytes" );
 
-    tokens tokenstable( _self, symbol.code().raw() );
-    auto existing_tk = tokenstable.find( token_id );
-    check( existing_tk != tokenstable.end(), "token with symbol does not exists" );
-    check( spender == existing_tk->spender, "spender is not token spender" );
-    check( spender != existing_tk->owner, "spender and owner must be different" );
-    name owner = existing_tk->owner;
+    ghosts ghoststable( _self, symbol.code().raw() );
+    auto existing_ghost = ghoststable.find( gene );
+    check( existing_ghost != ghoststable.end(), "ghost does not exists" );
+    check( spender == existing_ghost->spender, "spender is not token spender" );
+    check( spender != existing_ghost->owner, "spender and owner must be different" );
+    name owner = existing_ghost->owner;
 
     require_recipient( owner );
     require_recipient( to );
     
     auto payer = has_auth( to ) ? to : spender;
 
-    tokenstable.modify( existing_tk, payer, [&]( auto& token ) {
-        token.owner     = to;
-        token.spender   = to;
+    ghoststable.modify( existing_ghost, payer, [&]( auto& ghost ) {
+        ghost.owner     = to;
+        ghost.spender   = to;
     });
 
     asset unit( 1, symbol );
@@ -426,7 +443,7 @@ ACTION ghost::sendfrom( name spender, name to, id_type token_id, string memo ) {
     add_balance( to, unit, payer );
 }
 
-ACTION ghost::auctiontoken( name auctioneer, id_type token_id, asset min_price, uint32_t sec ) {
+ACTION ghost::auction( name auctioneer, id_type gene, asset min_price, uint32_t sec ) {
     require_auth( auctioneer );
 
     require_recipient( auctioneer );
@@ -439,30 +456,31 @@ ACTION ghost::auctiontoken( name auctioneer, id_type token_id, asset min_price, 
 
     const time_point_sec deadline = time_point_sec(now()) + sec;
 
-    tokens tokenstable( _self, symbol.code().raw() );
-    auto existing_tk = tokenstable.find( token_id );
-    check( existing_tk != tokenstable.end(), "token with symbol does not exists" );
-    check( existing_tk->owner == auctioneer, "not the owner of token" );
+    ghosts ghoststable( _self, symbol.code().raw() );
+    auto existing_ghost = ghoststable.find( gene );
+    check( existing_ghost != ghoststable.end(), "ghost does not exists" );
+    check( existing_ghost->owner == auctioneer, "not the owner of ghost" );
 
-    token_bids tokenbidstable( _self, symbol.code().raw() );
-    auto existing_bid = tokenbidstable.find( token_id );
-    check( existing_bid == tokenbidstable.end(), "token bid already exist" );
+    ghost_bids ghostbidstable( _self, symbol.code().raw() );
+    auto existing_bid = ghostbidstable.find( gene );
+    check( existing_bid == ghostbidstable.end(), "ghost bid already exist" );
+    
+    check( min_price.symbol == _info_state.supply.symbol, "min price asset must be key currency symbol" );
+    check( min_price.amount > 0, "min price must be a positive integer" );
 
-    check( min_price.amount > 0, "token bid already exist" );
-
-    tokenbidstable.emplace( auctioneer, [&]( auto& b ){
-        b.token_id    = token_id;
+    ghostbidstable.emplace( auctioneer, [&]( auto& b ){
+        b.gene        = gene;
         b.high_bidder = auctioneer;
         b.high_bid    = min_price.amount;
         b.deadline    = deadline;
     });
     
-    tokenstable.modify( existing_tk, same_payer, [&]( auto& token ) {
-        token.spender = _self;
+    ghoststable.modify( existing_ghost, same_payer, [&]( auto& ghost ) {
+        ghost.spender = _self;
     });
 }
 
-ACTION ghost::bidtoken( name bidder, id_type token_id, asset bid ) {
+ACTION ghost::bid( name bidder, id_type gene, asset bid ) {
     require_auth( bidder );
 
     check( bid.symbol == _info_state.supply.symbol, "bid asset must be key currency symbol" );
@@ -470,32 +488,32 @@ ACTION ghost::bidtoken( name bidder, id_type token_id, asset bid ) {
     auto symbol = _info_state.ghost_supply.symbol;
     check( symbol.is_valid(), "invalid symbol name" );
 
-    tokens tokenstable( _self, symbol.code().raw() );
-    auto existing_tk = tokenstable.find( token_id );
-    check( existing_tk != tokenstable.end(), "token with symbol does not exists" );
+    ghosts ghoststable( _self, symbol.code().raw() );
+    auto existing_ghost = ghoststable.find( gene );
+    check( existing_ghost != ghoststable.end(), "ghost does not exists" );
 
-    check( bidder != existing_tk->owner, "token owners can not bid" );
+    check( bidder != existing_ghost->owner, "ghost owners can not bid" );
 
-    token_bids tokenbidstable( _self, symbol.code().raw() );
-    auto existing_bid = tokenbidstable.find( token_id );
-    check( existing_bid != tokenbidstable.end(), "token auction is not exist" );
+    ghost_bids ghostbidstable( _self, symbol.code().raw() );
+    auto existing_bid = ghostbidstable.find( gene );
+    check( existing_bid != ghostbidstable.end(), "auction is not exist" );
 
     const time_point_sec time_now = time_point_sec(now());
     check( existing_bid->deadline > time_now, "the auction deadline has passed" );
     check( bid.amount > existing_bid->high_bid, "the bid amount is insufficient" );
 
-    if( existing_bid->high_bidder != existing_tk->owner ) {
-        asset refund_kc(existing_bid->high_bid, _info_state.supply.symbol);
+    if( existing_bid->high_bidder != existing_ghost->owner ) {
+        asset refund(existing_bid->high_bid, _info_state.supply.symbol);
         // refund
         action(
             permission_level{ _self, "active"_n },
             _self, "transfer"_n,
-            std::make_tuple( _self, existing_bid->high_bidder, refund_kc, std::string("refund bidding fee"))
+            std::make_tuple( _self, existing_bid->high_bidder, refund, std::string("refund bidding fee"))
         ).send();
     }
 
     // new high bidder
-    tokenbidstable.modify( existing_bid, same_payer, [&]( auto& b ){
+    ghostbidstable.modify( existing_bid, same_payer, [&]( auto& b ){
         b.high_bidder = bidder;
         b.high_bid    = bid.amount; 
     });
@@ -507,47 +525,47 @@ ACTION ghost::bidtoken( name bidder, id_type token_id, asset bid ) {
     bid_act.send( bid );
 }
 
-ACTION ghost::claimtoken( name requester, id_type token_id ) {
+ACTION ghost::claim( name requester, id_type gene ) {
     require_auth(requester);
 
     auto symbol = _info_state.ghost_supply.symbol;
     check( symbol.is_valid(), "invalid symbol name" );
 
-    tokens tokenstable( _self, symbol.code().raw() );
-    auto existing_tk = tokenstable.find( token_id );
-    check( existing_tk != tokenstable.end(), "token with symbol does not exists" );
+    ghosts ghoststable( _self, symbol.code().raw() );
+    auto existing_ghost = ghoststable.find( gene );
+    check( existing_ghost != ghoststable.end(), "ghost does not exists" );
 
-    token_bids tokenbidstable( _self, symbol.code().raw() );
-    auto existing_bid = tokenbidstable.find( token_id );
-    check( existing_bid != tokenbidstable.end(), "token auction is not exist" );
+    ghost_bids ghostbidstable( _self, symbol.code().raw() );
+    auto existing_bid = ghostbidstable.find( gene );
+    check( existing_bid != ghostbidstable.end(), "auction is not exist" );
 
     const time_point_sec time_now = time_point_sec(now());
     check( existing_bid->deadline <= time_now, "deadline not over" );
-    check( requester == existing_tk->owner || requester == existing_bid->high_bidder, "the requester is not authorized" );
+    check( requester == existing_ghost->owner || requester == existing_bid->high_bidder, "the requester is not authorized" );
 
-    if( existing_bid->high_bidder != existing_tk->owner ) {
-        asset payment_kc(existing_bid->high_bid, _info_state.supply.symbol);
+    if( existing_bid->high_bidder != existing_ghost->owner ) {
+        asset payment(existing_bid->high_bid, _info_state.supply.symbol);
 
         // bidding fee payment
         action(
             permission_level{ _self, "active"_n },
             _self, "transfer"_n,
-            std::make_tuple( _self, existing_tk->owner, payment_kc, std::string("receive auction sale money"))
+            std::make_tuple( _self, existing_ghost->owner, payment, std::string("receive auction sale money"))
         ).send();
 
         // nft ownership change
         action(
             permission_level{ _self, "active"_n },
             _self, "sendfrom"_n,
-            std::make_tuple( _self, existing_bid->high_bidder, token_id, std::string("receive bid tokens"))
+            std::make_tuple( _self, existing_bid->high_bidder, gene, std::string("receive auction ghosts"))
         ).send();
     } else {
-        tokenstable.modify( existing_tk, same_payer, [&]( auto& token ) {
-            token.spender = existing_tk->owner;
+        ghoststable.modify( existing_ghost, same_payer, [&]( auto& ghost ) {
+            ghost.spender = existing_ghost->owner;
         });
     }
 
-    tokenbidstable.erase( existing_bid );
+    ghostbidstable.erase( existing_bid );
 }
 
 void ghost::sub_balance( name owner, asset value ) {

@@ -60,23 +60,25 @@ CONTRACT ghost : public contract {
 
         ACTION close( name owner, const symbol& symbol );
 
-        ACTION issuenft( name to, uint64_t token_id, name token_name, asset value, const signature &sig, string memo );
+        ACTION createegg( name to, id_type gene, name token_name, const signature &sig, string memo );
 
-        ACTION burnnft( name owner, vector<uint64_t> token_ids, string memo );
+        ACTION levelup( name owner, id_type gene, uint8_t level, const signature &sig );
 
-        ACTION burnnftfrom( name burner, id_type token_id, string memo );
+        ACTION burnnft( name owner, vector<id_type> genes, string memo );
 
-        ACTION send( name from, name to, id_type token_id, string memo );
+        ACTION burnnftfrom( name burner, id_type gene, string memo );
 
-        ACTION approvenft( name owner, name spender, id_type token_id );
+        ACTION send( name from, name to, id_type gene, string memo );
 
-        ACTION sendfrom( name spender, name to, id_type token_id, string memo );
+        ACTION approvenft( name owner, name spender, id_type gene );
 
-        ACTION auctiontoken( name auctioneer, id_type token_id, asset min_price, uint32_t sec );
+        ACTION sendfrom( name spender, name to, id_type gene, string memo );
 
-        ACTION bidtoken( name bidder, id_type token_id, asset bid );
+        ACTION auction( name auctioneer, id_type gene, asset min_price, uint32_t sec );
 
-        ACTION claimtoken( name requester, id_type token_id );
+        ACTION bid( name bidder, id_type gene, asset bid );
+
+        ACTION claim( name requester, id_type gene );
 
         // dummy action
         ACTION bidresult( const asset& bid_key_currency ) { };
@@ -112,7 +114,7 @@ CONTRACT ghost : public contract {
 
     private:
         struct [[eosio::table("info")]] state {
-            asset supply       = asset{0, symbol(symbol_code("KRW"), 0)};
+            asset supply       = asset{0, symbol(symbol_code("SOUL"), 0)};
             asset ghost_supply = asset{0, symbol(symbol_code("GHOST"), 0)};
             public_key pub_key;
         };
@@ -130,24 +132,24 @@ CONTRACT ghost : public contract {
             uint64_t primary_key() const { return balance.symbol.code().raw(); }
         };
 
-        TABLE token {
-            id_type token_id;    // Unique 64 bit identifier,
+        TABLE ghost {
+            id_type gene;        // Unique 64 bit identifier,
             name    owner;  	 // token owner
-            asset   value;       // token value
 	        name    tokenName;	 // token name
+            uint8_t level;       // token level
             name    spender;     // token spender
 
-            id_type     primary_key() const { return token_id; }
+            id_type     primary_key() const { return gene; }
             uint64_t    get_owner() const { return owner.value; }
         };
 
-        TABLE token_bid {
-            id_type         token_id;
+        TABLE ghost_bid {
+            id_type         gene;
             name            high_bidder;
             int64_t         high_bid = 0;
             time_point_sec  deadline;
 
-            id_type     primary_key() const { return token_id; }
+            id_type     primary_key() const { return gene; }
         };
 
         typedef eosio::singleton< "info"_n, state > info_singleton;
@@ -156,11 +158,11 @@ CONTRACT ghost : public contract {
 
         typedef eosio::multi_index<"allowances"_n, allowance > allowances;
 
-        typedef eosio::multi_index<"token"_n, token,
-                                    indexed_by< "byowner"_n, const_mem_fun< token, uint64_t, &token::get_owner> >
-                                    > tokens;
+        typedef eosio::multi_index<"ghost"_n, ghost,
+                                    indexed_by< "byowner"_n, const_mem_fun< ghost, uint64_t, &ghost::get_owner> >
+                                    > ghosts;
 
-        typedef eosio::multi_index< "tokenbids"_n, token_bid> token_bids;
+        typedef eosio::multi_index< "ghostbids"_n, ghost_bid> ghost_bids;
 
         info_singleton  _info;
 
