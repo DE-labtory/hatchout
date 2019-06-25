@@ -1,9 +1,9 @@
-import {ItemRepository} from '../../port/persistence/repository/item.repository.impl';
 import {mock, instance, when, anything} from 'ts-mockito';
 import {Item} from '../../domain/item/item.entity';
 import {ItemService} from './item.service.impl';
 import {TestingModule, Test} from '@nestjs/testing';
 import {ItemDto} from './dto/item.dto';
+import {ItemRepository} from '../../port/persistence/repository/item.repository.impl';
 
 describe('ItemService', () => {
     const name = 'item name';
@@ -21,7 +21,7 @@ describe('ItemService', () => {
                 providers: [
                     ItemService,
                     {
-                        provide: 'IItemRepository',
+                        provide: 'ItemRepository',
                         useValue: instance(mockRepository),
                     },
                 ],

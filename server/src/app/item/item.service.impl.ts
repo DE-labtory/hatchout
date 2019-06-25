@@ -1,13 +1,14 @@
 import {Inject, Injectable} from '@nestjs/common';
 import {IItemService} from './item.service';
-import {IItemRepository} from '../../domain/item/item.repository';
 import {Item} from '../../domain/item/item.entity';
 import {DeleteResult, UpdateResult} from 'typeorm';
 import {ItemDto} from './dto/item.dto';
+import {InjectRepository} from '@nestjs/typeorm';
+import {IItemRepository} from '../../domain/item/item.repository';
 
 @Injectable()
 export class ItemService implements IItemService {
-    constructor(@Inject('IItemRepository') private itemRepository: IItemRepository) {}
+    constructor(@InjectRepository(Item) private itemRepository: IItemRepository) {}
 
     async create(itemDto: ItemDto): Promise<Item> {
         if (itemDto.name === undefined) {
