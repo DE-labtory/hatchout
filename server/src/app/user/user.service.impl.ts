@@ -1,11 +1,11 @@
-import {BadRequestException, Injectable, NotAcceptableException, NotFoundException} from '@nestjs/common';
+import {Injectable, NotAcceptableException, NotFoundException} from '@nestjs/common';
 import {UserService} from './user.service';
 import {User} from '../../domain/user/user.entity';
 import {DeleteResult} from 'typeorm';
-import {IUserRepository} from '../../domain/user/user.repository';
 import {InjectRepository} from '@nestjs/typeorm';
 import {UserDto} from './dto/user.dto';
 import {InvalidParameterException} from '../../domain/exception/InvalidParameterException';
+import {IUserRepository} from '../../domain/user/user.repository';
 
 @Injectable()
 export class UserServiceImpl implements UserService {

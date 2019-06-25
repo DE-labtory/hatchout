@@ -1,8 +1,8 @@
 import {GhostService} from './ghost.service';
 import {anything, instance, mock, objectContaining, when} from 'ts-mockito';
 import {Ghost} from '../../domain/ghost/ghost.entity';
-import {IGhostRepository} from '../../domain/ghost/ghost.repository';
 import {GhostRepository} from '../../port/persistence/repository/ghost.repository.impl';
+import {IGhostRepository} from '../../domain/ghost/ghost.repository';
 
 describe('GhostService', () => {
   let service: GhostService;
@@ -77,7 +77,7 @@ describe('GhostService', () => {
       when(repository.find(objectContaining(option))).thenReturn(new Promise((res) => {
         res([mockGhost, mockGhost2]);
       }));
-      const repositoryImpl: IGhostRepository = instance(repository);
+      const repositoryImpl: GhostRepository = instance(repository);
 
       service = new GhostService(repositoryImpl);
       const ghost = await service.findAll(0);

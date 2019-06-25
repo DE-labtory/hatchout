@@ -1,9 +1,10 @@
-import {TransactionRepository} from '../../port/persistence/repository/transaction.repository.impl';
+
 import {mock, instance, when, anything} from 'ts-mockito';
 import {TransactionService} from './transaction.service.impl';
 import {Test, TestingModule} from '@nestjs/testing';
 import {Transaction} from '../../domain/transaction/transaction.entity';
 import {CreateTransactionDto} from './dto/create-transaction.dto';
+import {TransactionRepository} from '../../port/persistence/repository/transaction.repository.impl';
 
 describe('TransactionService', async () => {
     const blockHash = '0x0000000000000000000000000000000000000000000000000000000012345678';
@@ -35,7 +36,7 @@ describe('TransactionService', async () => {
                 providers: [
                     TransactionService,
                     {
-                        provide: 'ITransactionRepository',
+                        provide: 'TransactionRepository',
                         useValue: instance(mockRepository),
                     },
                 ],

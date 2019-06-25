@@ -2,11 +2,11 @@ import {UserServiceImpl} from './user.service.impl';
 import {anything, instance, mock, when} from 'ts-mockito';
 import {TestingModule, Test} from '@nestjs/testing';
 import {User} from '../../domain/user/user.entity';
-import {UserRepository} from '../../port/persistence/repository/user.repository.impl';
 import {NotAcceptableException, NotFoundException} from '@nestjs/common';
 import {UserDto} from './dto/user.dto';
 import {ValidationException} from '../../domain/exception/ValidationException';
 import {InvalidParameterException} from '../../domain/exception/InvalidParameterException';
+import {UserRepository} from '../../port/persistence/repository/user.repository.impl';
 
 describe('UserServiceImpl', () => {
     const address = 'testAddress';
