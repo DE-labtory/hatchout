@@ -33,6 +33,25 @@ describe('GhostService', () => {
     });
   });
 
+  describe('#findOneByGene()', async () => {
+    const repository: GhostRepository = mock(GhostRepository);
+
+    it('should find ghost by gene', async () => {
+      const option = {
+        gene: 'FF9182839',
+      };
+
+      when(repository.findOne(objectContaining(option))).thenReturn(new Promise((res) => {
+        res(mockGhost);
+      }));
+      const repositoryImpl: IGhostRepository = instance(repository);
+
+      service = new GhostService(repositoryImpl);
+      const ghost = await service.findOneByGene('FF9182839');
+      expect(ghost).toEqual(mockGhost);
+    });
+  });
+
   describe('#findAllByUser()', async () => {
     const repository: GhostRepository = mock(GhostRepository);
 
@@ -103,7 +122,7 @@ describe('GhostService', () => {
 
       ghostDto = new GhostDto('userId3', 'EB123F345');
       service = new GhostService(repositoryImpl);
-      service.createEgg(ghostDto);
+      await service.createEgg(ghostDto);
 
       const ghost = await service.findOne(3);
       expect(ghost).toEqual(newGhost);
@@ -122,14 +141,14 @@ describe('GhostService', () => {
         gene: 'ABF938481',
       };
 
-      when(repository.find(objectContaining(option))).thenReturn(new Promise((res) => {
-        res([mockGhost2]);
+      when(repository.findOne(objectContaining(option))).thenReturn(new Promise((res) => {
+        res(mockGhost2);
       }));
 
       const repositoryImpl: IGhostRepository = instance(repository);
 
       service = new GhostService(repositoryImpl);
-      service.transfer('userId1', 'userId2', 'ABF938481');
+      await service.transfer('userId1', 'userId2', 'ABF938481');
 
       const ghost = await service.findOne(1);
       expect(ghost.userId).toEqual('userId2');
@@ -148,14 +167,14 @@ describe('GhostService', () => {
         gene: 'ABF938481',
       };
 
-      when(repository.find(objectContaining(option))).thenReturn(new Promise((res) => {
-        res([mockGhost2]);
+      when(repository.findOne(objectContaining(option))).thenReturn(new Promise((res) => {
+        res(mockGhost2);
       }));
 
       const repositoryImpl: IGhostRepository = instance(repository);
 
       service = new GhostService(repositoryImpl);
-      service.levelUp('ABF938481', 2);
+      await service.levelUp('ABF938481', 2);
 
       const ghost = await service.findOne(1);
       expect(ghost.level).toEqual(2);

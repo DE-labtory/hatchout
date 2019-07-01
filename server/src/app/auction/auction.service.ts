@@ -12,6 +12,14 @@ export class AuctionService {
         return await this.auctionRepository.findOne(id);
     }
 
+    async findOneByGene(gene: string): Promise<Auction> {
+        return await this.auctionRepository.findOne(
+            {
+                        gene,
+            },
+        );
+    }
+
     async createAuction(auctionDto: AuctionDto): Promise<Auction> {
         let newAuction;
         if (auctionDto.type === AuctionType.SALE_AUCTION) {
