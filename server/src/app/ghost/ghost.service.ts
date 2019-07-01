@@ -13,6 +13,14 @@ export class GhostService {
     return await this.ghostRepository.findOne(id);
   }
 
+  async findOneByGene(gene: string): Promise<Ghost> {
+    return await this.ghostRepository.findOne(
+        {
+          gene,
+        },
+    );
+  }
+
   async findAllByUser(userId: string): Promise<Ghost[]> {
     return await this.ghostRepository.find(
       {
@@ -53,6 +61,6 @@ export class GhostService {
         },
     );
     updatedGhost.setLevel(level);
-    return await this.ghostRepository.save(updatedGhost[0]);
+    return await this.ghostRepository.save(updatedGhost);
   }
 }

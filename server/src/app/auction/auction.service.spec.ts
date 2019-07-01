@@ -39,6 +39,25 @@ describe('AuctionService', () => {
         });
     });
 
+    describe('#findOneByGene()', async () => {
+        const repository: AuctionRepository = mock(AuctionRepository);
+
+        it('should find one auction by gene', async () => {
+            const option = {
+                gene: 'EB2820AC1',
+            };
+
+            when(repository.findOne(objectContaining(option))).thenReturn(new Promise((res) => {
+                res(mockSpecialAuction);
+            }));
+            const repositoryImpl: IAuctionRepository = instance(repository);
+
+            service = new AuctionService(repositoryImpl);
+            const auction = await service.findOneByGene('EB2820AC1');
+            expect(auction).toEqual(mockSpecialAuction);
+        });
+    });
+
     describe('#createAuction()', async () => {
         const repository: AuctionRepository = mock(AuctionRepository);
         let auctionDto: AuctionDto;
@@ -60,7 +79,7 @@ describe('AuctionService', () => {
             );
 
             service = new AuctionService(repositoryImpl);
-            service.createAuction(auctionDto);
+            await service.createAuction(auctionDto);
 
             const auction = await service.findOne(0);
             expect(auction).toEqual(mockSaleAuction);
@@ -81,7 +100,7 @@ describe('AuctionService', () => {
             );
 
             service = new AuctionService(repositoryImpl);
-            service.createAuction(auctionDto);
+            await service.createAuction(auctionDto);
 
             const auction = await service.findOne(1);
             expect(auction).toEqual(mockSpecialAuction);
@@ -107,7 +126,7 @@ describe('AuctionService', () => {
             const repositoryImpl: IAuctionRepository = instance(repository);
 
             service = new AuctionService(repositoryImpl);
-            service.updateWinner('EB2820AC1', 'user4', 5000);
+            await service.updateWinner('EB2820AC1', 'user4', 5000);
 
             const auction = await service.findOne(1);
             expect(auction.winnerId).toEqual('user4');
@@ -133,7 +152,7 @@ describe('AuctionService', () => {
             const repositoryImpl: IAuctionRepository = instance(repository);
 
             service = new AuctionService(repositoryImpl);
-            service.cancelAuction('EB2820AC1');
+            await service.cancelAuction('EB2820AC1');
 
             const auction = await service.findOne(1);
             expect(auction.endType).toEqual(AuctionEndType.CANCEL);
@@ -159,7 +178,7 @@ describe('AuctionService', () => {
             const repositoryImpl: IAuctionRepository = instance(repository);
 
             service = new AuctionService(repositoryImpl);
-            service.endAuction('EB2820AC1');
+            await service.endAuction('EB2820AC1');
 
             const auction = await service.findOne(1);
             expect(auction.endType).toEqual(AuctionEndType.SUCCESS);
