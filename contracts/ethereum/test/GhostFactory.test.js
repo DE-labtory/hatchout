@@ -49,6 +49,11 @@ contract('MockGhostFactory', accounts => {
       await shouldFail.reverting(GhostFactory.createEgg(geneOfGhost, owner, wrongSignature));
     });
 
+    it('revert when signature is used twice', async () => {
+      await GhostFactory.createEgg(geneOfGhost, owner, signature);
+      await shouldFail.reverting(GhostFactory.createEgg(geneOfGhost, owner, signature)); 
+    });
+
     it('successfully create egg', async () => {
       await GhostFactory.createEgg(geneOfGhost, owner, signature);
 
