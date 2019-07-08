@@ -91,6 +91,11 @@ contract('MockGhostFactory', accounts => {
       await shouldFail.reverting(GhostFactory.levelUp(owner, ghostID, wrongSignature, {from: owner, value: web3.utils.toWei("0", "szabo")}));
     });
 
+    it('reverts when called twice', async () => {
+      await GhostFactory.levelUp(owner, ghostID, signature, {from: owner, value: web3.utils.toWei("1", "szabo")});
+      await shouldFail.reverting(GhostFactory.levelUp(owner, ghostID, signature, {from: owner, value: web3.utils.toWei("1", "szabo")}));
+    });
+
     it('successfully the ghost\'s level up', async () => {
       await GhostFactory.levelUp(owner, ghostID, signature, {from: owner, value: web3.utils.toWei("1", "szabo")});
 
