@@ -19,12 +19,13 @@ import { JwtStrategy } from '../../app/auth/jwt.strategy';
                     return 'secretKey';
                 },
             signOptions: {
-                expiresIn: 3600,
+                expiresIn: '10h',
             },
         }),
         UserModule],
-    providers: [AuthService, UserRepository, JwtStrategy,
-        {provide: 'UserService', useClass: UserServiceImpl},
+    providers: [
+        AuthService,
+        JwtStrategy,
         {provide: 'ValidationService', useClass: ValidationServiceImpl},
         {provide: 'BridgeService', useClass: Web3BridgeService},
         {provide: 'WEB3', useClass: Web3},

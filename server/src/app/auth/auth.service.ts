@@ -22,17 +22,20 @@ export class AuthService {
 
         return {
             expiresIn: 3600,
-            accessToken: this.jwtService.sign(address),
+            accessToken: this.jwtService.sign({
+                address,
+                expiresIn: 3600,
+            }),
         };
     }
 
-    async signUp(address: string, message: string, signature: string): Promise<SignUpResponseDto> {
+    async signUp(address: string, name: string, message: string, signature: string): Promise<SignUpResponseDto> {
         const result: boolean = this.validationService.verify(address, message, signature);
         if (!result) {
             throw new UnauthorizedException();
         }
 
-        const user: User = await this.userService.create(address, 'name');
+        const user: User = await this.userService.create(address, name);
         const jwt: Token = await this.createToken(address);
 
         return new SignUpResponseDto(jwt.accessToken, user.address, user.name);

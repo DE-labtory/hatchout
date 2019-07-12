@@ -25,10 +25,10 @@ export class UserServiceImpl implements UserService {
 
     async create(address: string, name: string): Promise<User> {
         if (address === undefined) {
-            throw new Error('address should be defined');
+            throw new InvalidParameterException('address should be defined');
         }
         if (name === undefined) {
-            throw new Error('name should be defined');
+            throw new InvalidParameterException('name should be defined');
         }
         const userRetrieved = await this.userRepository.findByAddress(address);
         if (userRetrieved !== undefined) {

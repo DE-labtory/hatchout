@@ -177,7 +177,7 @@ describe('GhostService', () => {
       await service.levelUp('ABF938481', 2);
 
       const ghost = await service.findOne(1);
-      expect(ghost.level).toEqual(2);
+      expect(ghost.level).toEqual(1);
     });
   });
 });

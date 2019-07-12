@@ -59,38 +59,6 @@ describe('User Controller', () => {
                 .toThrowError(NotFoundException);
         });
     });
-    describe('#create()', () => {
-        let userDto: UserDto;
-
-        it('should return user', async () => {
-            userDto = new UserDto(address, name);
-            when(mockUserService.create(userDto)).thenReturn(new Promise((resolve => {
-                resolve(user);
-            })));
-            controller = new UserController(instance(mockUserService));
-
-            expect(await controller.create(userDto)).toBe(user);
-
-        });
-        it('should throw InvalidParameterException', async () => {
-            userDto = new UserDto();
-            when(mockUserService.create(userDto)).thenThrow(new InvalidParameterException('address should be defined'));
-            controller = new UserController(instance(mockUserService));
-
-            await expect(controller.create(userDto))
-                .rejects
-                .toThrowError(InvalidParameterException);
-        });
-        it('should throw NotAcceptableException', async () => {
-            userDto = new UserDto();
-            when(mockUserService.create(userDto)).thenThrow(new NotAcceptableException('address is already registered'));
-            controller = new UserController(instance(mockUserService));
-
-            await expect(controller.create(userDto))
-                .rejects
-                .toThrowError(NotAcceptableException);
-        });
-    });
     describe('#delete()', () => {
         const id = 1;
 

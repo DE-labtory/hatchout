@@ -1,11 +1,13 @@
 export class SignUpRequestDto {
-    address: string;
-    message: string;
-    signature: string;
+  name: string;
+  address: string;
+  message: string;
+  signature: string;
 
-    constructor(address: string, message: string, signature: string) {
-        this.address = address;
-        this.message = message;
-        this.signature = signature;
-    }
+  constructor(name: string, address: string, message: string, signature: string) {
+    this.name = name;
+    this.address = address;
+    this.message = message;
+    this.signature = signature;
+  }
 }

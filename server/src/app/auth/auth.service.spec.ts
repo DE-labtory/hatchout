@@ -1,15 +1,15 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { AuthService } from './auth.service';
-import { JwtService } from '@nestjs/jwt';
-import { anything, instance, mock, when } from 'ts-mockito';
-import { UserServiceImpl } from '../user/user.service.impl';
-import { ValidationServiceImpl } from '../../domain/user/validation.service.impl';
-import { User } from '../../domain/user/user.entity';
-import { Token } from './token.entity';
-import { UserService } from '../user/user.service';
-import { ValidationService } from '../../domain/user/validation.service';
-import { SignUpResponseDto } from './dto/sign-up-response.dto';
-import { SignInResponseDto } from './dto/sign-in-response.dto';
+import {Test, TestingModule} from '@nestjs/testing';
+import {AuthService} from './auth.service';
+import {JwtService} from '@nestjs/jwt';
+import {anything, instance, mock, objectContaining, when} from 'ts-mockito';
+import {UserServiceImpl} from '../user/user.service.impl';
+import {ValidationServiceImpl} from '../../domain/user/validation.service.impl';
+import {User} from '../../domain/user/user.entity';
+import {Token} from './token.entity';
+import {UserService} from '../user/user.service';
+import {ValidationService} from '../../domain/user/validation.service';
+import {SignUpResponseDto} from './dto/sign-up-response.dto';
+import {SignInResponseDto} from './dto/sign-in-response.dto';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -27,7 +27,7 @@ describe('AuthService', () => {
     it('should be defined', async () => {
       const module: TestingModule = await Test.createTestingModule({
         providers: [
-            AuthService,
+          AuthService,
           {provide: 'JwtService', useValue: instance(mockJwtService)},
           {provide: 'UserService', useValue: instance(mockUserService)},
           {provide: 'ValidationService', useValue: instance(mockValidationService)},
@@ -48,16 +48,16 @@ describe('AuthService', () => {
 
       when(mockJwtService.sign(anything())).thenReturn(result.accessToken);
       service = new AuthService(instance(mockJwtService),
-          instance(mockUserService),
-          instance(mockValidationService));
+        instance(mockUserService),
+        instance(mockValidationService));
 
       expect(service.createToken('address')).toEqual(result);
     });
 
     it('should throw "address should be defined"', async () => {
       service = new AuthService(instance(mockJwtService),
-          instance(mockUserService),
-          instance(mockValidationService));
+        instance(mockUserService),
+        instance(mockValidationService));
 
       expect(() => {
         service.createToken(undefined);
@@ -65,7 +65,7 @@ describe('AuthService', () => {
     });
   });
 
-  describe('#signUp',  () => {
+  describe('#signUp', () => {
     it('should create a user', async () => {
       const mockService: AuthService = mock(AuthService);
 
@@ -76,65 +76,68 @@ describe('AuthService', () => {
       };
 
       const signUpResponseDto: SignUpResponseDto
-          = new SignUpResponseDto(accessToken, address, name);
+        = new SignUpResponseDto(accessToken, address, name);
 
       when(mockValidationService.verify(address, message, signature))
-          .thenReturn(true);
+        .thenReturn(true);
 
       when(mockUserService.create(address, name))
-          .thenReturn(new Promise((resolve) => {
-        resolve(user);
-      }));
+        .thenReturn(new Promise((resolve) => {
+          resolve(user);
+        }));
 
       when(mockService.createToken(address))
-          .thenReturn(jwt);
+        .thenReturn(jwt);
 
-      when(mockJwtService.sign(address)).thenReturn(accessToken);
+      when(mockJwtService.sign(objectContaining({
+        expiresIn: 3600,
+        address,
+      }))).thenReturn(accessToken);
 
       service = new AuthService(instance(mockJwtService),
-          instance(mockUserService),
-          instance(mockValidationService));
+        instance(mockUserService),
+        instance(mockValidationService));
 
-      await expect(service.signUp(address, message, signature)).resolves.toEqual(signUpResponseDto);
+      await expect(service.signUp(address, name, message, signature)).resolves.toEqual(signUpResponseDto);
     });
     it('should throw UnauthorizedException()', async () => {
 
       when(mockValidationService.verify(address, message, signature))
-          .thenReturn(false);
+        .thenReturn(false);
 
       service = new AuthService(instance(mockJwtService),
-          instance(mockUserService),
-          instance(mockValidationService));
+        instance(mockUserService),
+        instance(mockValidationService));
 
-      await expect(service.signUp(address, message, signature))
-          .rejects.toThrow();
+      await expect(service.signUp(address, name, message, signature))
+        .rejects.toThrow();
     });
     it('should throw UnauthorizedException()', async () => {
       const mockService: AuthService = mock(AuthService);
 
       when(mockValidationService.verify(address, message, signature))
-          .thenReturn(true);
+        .thenReturn(true);
 
       when(mockUserService.create(address, name))
-          .thenReturn(new Promise((resolve) => {
-            resolve(undefined);
-          }));
+        .thenReturn(new Promise((resolve) => {
+          resolve(undefined);
+        }));
 
       when(mockService.createToken(address))
-          .thenReturn(undefined);
+        .thenReturn(undefined);
 
       when(mockJwtService.sign(address)).thenReturn(undefined);
 
       service = new AuthService(instance(mockJwtService),
-          instance(mockUserService),
-          instance(mockValidationService));
+        instance(mockUserService),
+        instance(mockValidationService));
 
-      await expect(service.signUp(address, message, signature))
-          .rejects.toThrow();
+      await expect(service.signUp(address, name, message, signature))
+        .rejects.toThrow();
     });
   });
 
-  describe('#signIn',  () => {
+  describe('#signIn', () => {
     it('should return a user', async () => {
 
       const mockService: AuthService = mock(AuthService);
@@ -146,72 +149,72 @@ describe('AuthService', () => {
       };
 
       const signInResponseDto: SignInResponseDto
-          = new SignInResponseDto(accessToken, address, name);
+        = new SignInResponseDto(accessToken, address, name);
 
       when(mockValidationService.verify(address, message, signature))
-          .thenReturn(true);
+        .thenReturn(true);
 
       when(mockUserService.getByAddress(address))
-          .thenReturn(new Promise((resolve) => {
-            resolve(user);
-          }));
+        .thenReturn(new Promise((resolve) => {
+          resolve(user);
+        }));
 
       when(mockService.createToken(address))
-          .thenReturn(jwt);
+        .thenReturn(jwt);
 
       when(mockJwtService.sign(address)).thenReturn(accessToken);
 
       service = new AuthService(instance(mockJwtService),
-          instance(mockUserService),
-          instance(mockValidationService));
+        instance(mockUserService),
+        instance(mockValidationService));
 
       await expect(service.signIn(address, message, signature)).resolves.toEqual(signInResponseDto);
     });
     it('should throw UnauthorizedException()', async () => {
 
       when(mockValidationService.verify(address, message, signature))
-          .thenReturn(false);
+        .thenReturn(false);
 
       service = new AuthService(instance(mockJwtService),
-          instance(mockUserService),
-          instance(mockValidationService));
+        instance(mockUserService),
+        instance(mockValidationService));
 
-      await expect(service.signUp(address, message, signature))
-          .rejects.toThrow();
+      await expect(service.signUp(address, name, message, signature))
+        .rejects.toThrow();
     });
     it('should throw "user not found"', async () => {
 
       when(mockValidationService.verify(address, message, signature))
-          .thenReturn(true);
+        .thenReturn(true);
 
       when(mockUserService.getByAddress(address))
-          .thenReturn(new Promise((resolve) => {
-            resolve(undefined);
-          }));
+        .thenReturn(new Promise((resolve) => {
+          resolve(undefined);
+        }));
 
       service = new AuthService(instance(mockJwtService),
-          instance(mockUserService),
-          instance(mockValidationService));
+        instance(mockUserService),
+        instance(mockValidationService));
 
-      await expect(service.signUp(address, message, signature))
-          .rejects.toThrow();
+      await expect(service.signUp(address, name, message, signature))
+        .rejects.toThrow();
     });
     it('should throw UnauthorizedException', async () => {
 
       when(mockValidationService.verify(address, message, signature))
-          .thenReturn(false);
+        .thenReturn(false);
 
       when(mockUserService.getByAddress(address))
-          .thenReturn(new Promise((resolve) => {
-            resolve(undefined);
-          })).thenThrow(new Error('user not found'));
+        .thenReturn(new Promise((resolve) => {
+          resolve(undefined);
+        })).thenThrow(new Error('user not found'));
 
       service = new AuthService(instance(mockJwtService),
-          instance(mockUserService),
-          instance(mockValidationService));
+        instance(mockUserService),
+        instance(mockValidationService));
 
       await expect(service.signIn(address, message, signature))
-          .rejects.toThrow();
+        .rejects.toThrow();
     });
   });
 });

@@ -75,9 +75,8 @@ describe('UserServiceImpl', () => {
                 ),
             );
             service = new UserServiceImpl(instance(mockRepository));
-            userDto = new UserDto();
 
-            await expect(service.create(address, name))
+            await expect(service.create(address, undefined))
                 .rejects
                 .toThrowError(InvalidParameterException);
         });
@@ -87,9 +86,8 @@ describe('UserServiceImpl', () => {
                 ),
             );
             service = new UserServiceImpl(instance(mockRepository));
-            userDto = new UserDto(address);
 
-            await expect(service.create(address, name))
+            await expect(service.create(undefined, name))
                 .rejects
                 .toThrowError(InvalidParameterException);
         });
