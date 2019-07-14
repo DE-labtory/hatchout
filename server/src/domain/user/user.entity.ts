@@ -55,7 +55,7 @@ export class User {
     public getLevel(): number {
         return this.level;
     }
-    public async increasePoint(amount: number): Promise<User> {
+    public increasePoint(amount: number): User {
         if (amount < 0) {
             throw new ValidationException('amount should be positive');
         }
@@ -63,7 +63,7 @@ export class User {
         this.point += amount;
         return this;
     }
-    public async decreasePoint(amount: number): Promise<User> {
+    public decreasePoint(amount: number): User {
         if (amount < 0) {
             throw new ValidationException('amount should be positive');
         }
@@ -74,7 +74,7 @@ export class User {
         this.point -= amount;
         return this;
     }
-    public async increaseLevel(amount: number): Promise<User> {
+    public increaseLevel(amount: number): User {
         if (amount < 0) {
             throw new ValidationException('amount should be positive');
         }

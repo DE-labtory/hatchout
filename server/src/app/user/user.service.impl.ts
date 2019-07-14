@@ -45,7 +45,7 @@ export class UserServiceImpl implements UserService {
             throw new NotFoundException('user with the id is not found');
         }
 
-        return user.increasePoint(amount);
+        return await this.userRepository.save(user.increasePoint(amount));
     }
 
     async decreasePoint(id: number, amount: number): Promise<User> {
@@ -54,7 +54,7 @@ export class UserServiceImpl implements UserService {
             throw new NotFoundException('user with the id is not found');
         }
 
-        return await user.decreasePoint(amount);
+        return await this.userRepository.save(user.decreasePoint(amount));
     }
     async increaseLevel(id: number, amount: number): Promise<User> {
         const user = await this.userRepository.findById(id);
@@ -62,6 +62,6 @@ export class UserServiceImpl implements UserService {
             throw new NotFoundException('user with the id is not found');
         }
 
-        return await user.increaseLevel(amount);
+        return await this.userRepository.save(user.increaseLevel(amount));
     }
 }
