@@ -8,7 +8,6 @@ import {UserModule} from './port/module/user.module';
 import {ItemModule} from './port/module/item.module';
 import {TransactionModule} from './port/module/transaction.module';
 import {DatabaseModule} from './port/module/database.module';
-import {EventSubscriberModule} from './port/adapter/service/blockchain/ethereum/event/event.subscriber.module';
 
 @Module({
   imports: [
@@ -18,7 +17,6 @@ import {EventSubscriberModule} from './port/adapter/service/blockchain/ethereum/
     TransactionModule,
     UserModule,
     DatabaseModule,
-    EventSubscriberModule,
   ],
   controllers: [AppController],
   providers: [AppService],
