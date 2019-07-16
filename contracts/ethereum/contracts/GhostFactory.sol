@@ -7,6 +7,9 @@ contract GhostFactory is GhostOwnership {
 
     using ECDSA for bytes32;
 
+    mapping (bytes => bool) createSignatures;
+    mapping (bytes => bool) levelSignatures;
+
     constructor (address payable _ceoAddress) public GhostOwnership(_ceoAddress){}
 
     // TODO: setting fee to need to level up.
@@ -21,6 +24,7 @@ contract GhostFactory is GhostOwnership {
         require(_gene != 0);
         require(_gene == uint256(uint64(_gene)));
         require(_owner != address(0));
+        require(!createSignatures[_signature]);
 
         bytes32 hash = keccak256(abi.encodePacked(_gene, _owner));
         bytes32 messageHash = hash.toEthSignedMessageHash();
@@ -28,6 +32,7 @@ contract GhostFactory is GhostOwnership {
         address signer = messageHash.recover(_signature);
         require(signer == _owner);
 
+        createSignatures[_signature] = true;
         _createEgg(uint64(_gene), _owner);
     }
 
@@ -40,8 +45,10 @@ contract GhostFactory is GhostOwnership {
         require(msg.value >= levelUpFee);
         require(_owner != address(0));
         require(_owns(_owner, _tokenId));
+        require(!levelSignatures[_signature]);
 
-        bytes32 hash = keccak256(abi.encodePacked(_tokenId));
+        uint256 level = ghosts[_tokenId].level;
+        bytes32 hash = keccak256(abi.encodePacked(_tokenId, level));
         bytes32 messageHash = hash.toEthSignedMessageHash();
 
         address signer = messageHash.recover(_signature);
@@ -57,6 +64,7 @@ contract GhostFactory is GhostOwnership {
 
         ceoAddress.transfer(levelUpFee);
 
+        levelSignatures[_signature] = true;
         _levelUp(_owner, _tokenId);
     }
 }

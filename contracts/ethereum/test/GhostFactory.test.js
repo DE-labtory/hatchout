@@ -49,6 +49,12 @@ contract('MockGhostFactory', accounts => {
       await shouldFail.reverting(GhostFactory.createEgg(geneOfGhost, owner, wrongSignature));
     });
 
+    it('revert when signature is used twice', async () => {
+      await GhostFactory.createEgg(geneOfGhost, owner, signature);
+
+      await shouldFail.reverting(GhostFactory.createEgg(geneOfGhost, owner, signature));
+    });
+
     it('successfully create egg', async () => {
       await GhostFactory.createEgg(geneOfGhost, owner, signature);
 
@@ -64,7 +70,7 @@ contract('MockGhostFactory', accounts => {
       hash = await web3.utils.soliditySha3(geneOfGhost, owner);
       signature = await web3.eth.sign(hash, owner);
       await GhostFactory.createEgg(geneOfGhost, owner, signature);
-      hash = await web3.utils.soliditySha3(ghostID);
+      hash = await web3.utils.soliditySha3(ghostID, new BN(0));
       signature = await web3.eth.sign(hash, owner);
     });
 
@@ -77,13 +83,19 @@ contract('MockGhostFactory', accounts => {
     });
 
     it('reverts when owner who does not have the ghost', async () => {
-      await shouldFail.reverting(GhostFactory.levelUp(ceo, ghostID, signature, {from: owner, value: web3.utils.toWei("0", "szabo")}));
+      await shouldFail.reverting(GhostFactory.levelUp(ceo, ghostID, signature, {from: owner, value: web3.utils.toWei("1", "szabo")}));
     });
 
     it('reverts when signature is not same', async () => {
       const wrongSignature = await web3.eth.sign(hash, ceo);
 
-      await shouldFail.reverting(GhostFactory.levelUp(owner, ghostID, wrongSignature, {from: owner, value: web3.utils.toWei("0", "szabo")}));
+      await shouldFail.reverting(GhostFactory.levelUp(owner, ghostID, wrongSignature, {from: owner, value: web3.utils.toWei("1", "szabo")}));
+    });
+
+    it('reverts when signature is used twice', async () => {
+      await GhostFactory.levelUp(owner, ghostID, signature, {from: owner, value: web3.utils.toWei("1", "szabo")});
+
+      await shouldFail.reverting(GhostFactory.levelUp(owner, ghostID, signature, {from: owner, value: web3.utils.toWei("1", "szabo")}));
     });
 
     it('successfully the ghost\'s level up', async () => {
