@@ -43,12 +43,12 @@ contract AuctionBase {
     mapping (uint256 => mapping (address => uint256)) tokenIdToBidderAndAmount;
     mapping (uint256 => address[]) tokenIdToBidders;
 
-    event AuctionCreated(uint256 gene, uint256 duration, uint256 auctionType);
-    event AuctionSuccessful(uint256 gene, uint256 maxPrice, address payable winner);
-    event AuctionCancelled(uint256 gene);
+    event AuctionCreated(uint256 tokenId, uint256 duration, uint256 auctionType);
+    event AuctionSuccessful(uint256 tokenId, uint256 maxPrice, address payable winner);
+    event AuctionCancelled(uint256 tokenId);
 
-    event BidderCreated(uint256 gene, address payable bidder, uint256 newAmount);
-    event BidAmountUpdated(uint256 gene, address payable bidder, uint256 newAmount);
+    event BidderCreated(uint256 tokenId, address payable bidder, uint256 newAmount);
+    event BidAmountUpdated(uint256 tokenId, address payable bidder, uint256 newAmount);
 
     // @notice Returns true if given address owns the token.
     function _owns(address _owner, uint256 _tokenId) internal view returns (bool) {
@@ -72,9 +72,7 @@ contract AuctionBase {
     function _addAuction(uint256 _tokenId, Auction memory _auction, uint256 _auctionType) internal {
         tokenIdToAuction[_tokenId] = _auction;
 
-        uint256 gene = nonFungibleContract.getGene(_tokenId);
-
-        emit AuctionCreated(gene, uint256(_auction.duration), _auctionType);
+        emit AuctionCreated(_tokenId, uint256(_auction.duration), _auctionType);
     }
 
     // @notice removes an auction from the list of auctions.
@@ -95,8 +93,7 @@ contract AuctionBase {
     function _cancelAuction(uint256 _tokenId) internal {
         _transfer(tokenIdToAuction[_tokenId].seller, _tokenId);
         _removeAuction(_tokenId);
-        uint256 gene = nonFungibleContract.getGene(_tokenId);
-        emit AuctionCancelled(gene);
+        emit AuctionCancelled(_tokenId);
     }
 
     // @notice check if auction is ongoing.
@@ -122,9 +119,7 @@ contract AuctionBase {
         auction.winner = _bidder;
         auction.maxPrice = _bidAmount;
 
-        uint256 gene = nonFungibleContract.getGene(_tokenId);
-
-        emit BidderCreated(gene, _bidder, _bidAmount);
+        emit BidderCreated(_tokenId, _bidder, _bidAmount);
     }
 
     // @notice amount of bidder who have participated updates.
@@ -144,9 +139,7 @@ contract AuctionBase {
         auction.winner = _bidder;
         auction.maxPrice = _bidAmount;
 
-        uint256 gene = nonFungibleContract.getGene(_tokenId);
-
-        emit BidAmountUpdated(gene, _bidder, _bidAmount);
+        emit BidAmountUpdated(_tokenId, _bidder, _bidAmount);
     }
 
     // @notice check if the auction is finished by checking startedAt and duration of auction.
@@ -188,9 +181,7 @@ contract AuctionBase {
         if (auction.winner != address(0)) {
             _transfer(auction.winner, _tokenId);
 
-            uint256 gene = nonFungibleContract.getGene(_tokenId);
-
-            emit AuctionSuccessful(gene, uint256(auction.maxPrice), auction.winner);
+            emit AuctionSuccessful(_tokenId, uint256(auction.maxPrice), auction.winner);
             _removeAuction(_tokenId);
         } else {
             _cancelAuction(_tokenId);

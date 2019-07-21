@@ -6,7 +6,7 @@ import {Test, TestingModule} from '@nestjs/testing';
 import {ItemDto} from '../../app/item/dto/item.dto';
 
 describe('Item Controller', () => {
-    const mockItemService = mock(ItemService);
+    const mockItemService: ItemService = mock(ItemService);
     let controller: ItemController;
     let item: Item;
 

@@ -10,10 +10,12 @@ describe('GhostService', () => {
   const mockGhost: Ghost = new Ghost(
     'FF9182839',
     1,
+    1,
     'userId1',
   );
   const mockGhost2: Ghost = new Ghost(
     'ABF938481',
+    2,
     1,
     'userId2',
   );
@@ -110,6 +112,7 @@ describe('GhostService', () => {
     it('should create egg of ghost', async () => {
       const newGhost = new Ghost(
           'EB123F345',
+          3,
           0,
           'userId3',
       );

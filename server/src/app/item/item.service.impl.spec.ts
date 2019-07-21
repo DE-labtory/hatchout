@@ -10,7 +10,7 @@ describe('ItemService', () => {
     const price = 9900;
     const detail = 'this is item';
 
-    const mockRepository = mock(ItemRepository);
+    const mockRepository: ItemRepository = mock(ItemRepository);
     const item: Item = new Item(name, price, detail);
     let service: ItemService;
 

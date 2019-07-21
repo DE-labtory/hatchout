@@ -40,7 +40,7 @@ export class GhostService {
   }
 
   async createEgg(ghostDto: GhostDto): Promise<Ghost> {
-    const newGhost = new Ghost(ghostDto.gene, 0, ghostDto.owner);
+    const newGhost = new Ghost(ghostDto.gene, ghostDto.tokenId, 0, ghostDto.owner);
     return await this.ghostRepository.save(newGhost);
   }
 

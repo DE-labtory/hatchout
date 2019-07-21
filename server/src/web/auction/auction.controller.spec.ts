@@ -5,7 +5,7 @@ import {Auction, AuctionType} from '../../domain/auction/auction.entity';
 import {Test, TestingModule} from '@nestjs/testing';
 
 describe('Auction Controller', () => {
-    const mockAuctionService = mock(AuctionService);
+    const mockAuctionService: AuctionService = mock(AuctionService);
     let controller: AuctionController;
     let saleAuction: Auction;
     let specialAuction: Auction;
@@ -13,6 +13,7 @@ describe('Auction Controller', () => {
     beforeEach(() => {
         saleAuction = new Auction(
             'AA239BE27',
+            1,
             'user1',
             60,
             AuctionType.SALE_AUCTION,
@@ -22,6 +23,7 @@ describe('Auction Controller', () => {
 
         specialAuction = new Auction(
             'EB2820AC1',
+            2,
             'user2',
             120,
             AuctionType.SPECIAL_AUCTION,
@@ -56,12 +58,12 @@ describe('Auction Controller', () => {
 
     describe('#findOneByGene()', () => {
         it('should find one auction by gene', async () => {
-            when(mockAuctionService.findOneByGene('AA239BE27')).thenReturn(new Promise((resolve) => {
+            when(mockAuctionService.findOneByTokenId(1)).thenReturn(new Promise((resolve) => {
                 resolve(saleAuction);
             }));
             controller = new AuctionController(instance(mockAuctionService));
 
-            expect(await controller.findOneByGene('AA239BE27')).toBe(saleAuction);
+            expect(await controller.findOneByTokenId(1)).toBe(saleAuction);
         });
     });
 });

@@ -5,13 +5,14 @@ import {GhostService} from '../../app/ghost/ghost.service';
 import {Ghost} from '../../domain/ghost/ghost.entity';
 
 describe('Ghost Controller', () => {
-  const mockGhostService = mock(GhostService);
+  const mockGhostService: GhostService = mock(GhostService);
   let ghost: Ghost;
   let controller: GhostController;
 
   beforeEach(() => {
     ghost = new Ghost(
         'EE398A811',
+        1,
         0,
         'user1',
     );

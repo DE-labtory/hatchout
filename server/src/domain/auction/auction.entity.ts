@@ -8,6 +8,9 @@ export class Auction {
     @Column()
     gene: string;
 
+    @Column({unique: true})
+    tokenId: number;
+
     @Column()
     sellerId: string;
 
@@ -40,8 +43,9 @@ export class Auction {
     @UpdateDateColumn()
     updateDate: Date;
 
-    constructor(gene: string, sellerId: string, duration: number, auctionType: number, winnderId?: string, bidAmount?: number) {
+    constructor(gene: string, tokenId: number, sellerId: string, duration: number, auctionType: number, winnderId?: string, bidAmount?: number) {
         this.gene = gene;
+        this.tokenId = tokenId;
         this.sellerId = sellerId;
         this.duration = duration;
         this.auctionType = auctionType;
