@@ -11,7 +11,7 @@ import {UserRepository} from '../../port/persistence/repository/user.repository.
 describe('UserServiceImpl', () => {
     const address = 'testAddress';
     const name = 'testName';
-    const mockRepository = mock(UserRepository);
+    const mockRepository: UserRepository = mock(UserRepository);
     let user: User;
     let service: UserServiceImpl;
 

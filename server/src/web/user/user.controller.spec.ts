@@ -10,7 +10,7 @@ import {InvalidParameterException} from '../../domain/exception/InvalidParameter
 import {ValidationException} from '../../domain/exception/ValidationException';
 
 describe('User Controller', () => {
-    const mockUserService = mock(UserServiceImpl);
+    const mockUserService: UserServiceImpl = mock(UserServiceImpl);
     const address = 'testAddress';
     const name = 'name';
     let user: User;

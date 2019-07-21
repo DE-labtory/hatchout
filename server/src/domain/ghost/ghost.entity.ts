@@ -9,6 +9,9 @@ export class Ghost {
   @Column()
   gene: string;
 
+  @Column({unique: true})
+  tokenId: number;
+
   @Column()
   level: number;
 
@@ -21,8 +24,9 @@ export class Ghost {
   @UpdateDateColumn()
   updateDate: Date;
 
-  constructor(gene: string, level: number, userId: string) {
+  constructor(gene: string, tokenId: number, level: number, userId: string) {
     this.gene = gene;
+    this.tokenId = tokenId;
     this.level = level;
     this.userId = userId;
   }

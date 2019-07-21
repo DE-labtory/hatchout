@@ -8,14 +8,14 @@ import {CreateTransactionDto} from '../../app/transaction/dto/create-transaction
 describe('TransactionController', () => {
     const blockHash = '0x0000000000000000000000000000000000000000000000000000000012345678';
     const blockNumber = 0;
-    const txHash = '0x0000000000000000000000000000000000000000000000000000000009101112';
+    const txHash = '0x0000000000000000000000000000000000000000000000000000000009101113';
     const txIndex = 1;
     const from = '0x1234000000000000000000000000000000000000';
     const to = '0x5678000000000000000000000000000000000000';
     const contractAddress = '0x0910000000000000000000000000000000000000';
     const status = '0x0';
 
-    const mockService = mock(TransactionService);
+    const mockService: TransactionService = mock(TransactionService);
     const transaction: Transaction = new Transaction(
         blockHash,
         blockNumber,
@@ -122,7 +122,6 @@ describe('TransactionController', () => {
         it('should throw "txHash should be defined"', async () => {
             transactionDto = new CreateTransactionDto();
             when(mockService.create(transactionDto))
-                .thenReject()
                 .thenThrow(new Error('txHash should be defined'));
             controller = new TransactionController(instance(mockService));
 
@@ -143,7 +142,6 @@ describe('TransactionController', () => {
                 status,
             );
             when(mockService.create(transactionDto))
-                .thenReject()
                 .thenThrow(new Error('txHash is already registered'));
             controller = new TransactionController(instance(mockService));
 

@@ -13,7 +13,7 @@ export class AuctionController {
     }
 
     @Get()
-    async findOneByGene(@Query('gene') gene): Promise<Auction> {
-        return await this.service.findOneByGene(gene);
+    async findOneByTokenId(@Query('tokenId') tokenId): Promise<Auction> {
+        return await this.service.findOneByTokenId(tokenId);
     }
 }

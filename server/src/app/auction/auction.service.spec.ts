@@ -10,6 +10,7 @@ describe('AuctionService', () => {
     let service: AuctionService;
     const mockSaleAuction: Auction = new Auction(
         'AA239BE27',
+        1,
         'user1',
         60,
         AuctionType.SALE_AUCTION,
@@ -19,6 +20,7 @@ describe('AuctionService', () => {
 
     const mockSpecialAuction: Auction = new Auction(
         'EB2820AC1',
+        2,
         'user2',
         120,
         AuctionType.SPECIAL_AUCTION,
@@ -39,12 +41,12 @@ describe('AuctionService', () => {
         });
     });
 
-    describe('#findOneByGene()', async () => {
+    describe('#findOneByTokenId()', async () => {
         const repository: AuctionRepository = mock(AuctionRepository);
 
         it('should find one auction by gene', async () => {
             const option = {
-                gene: 'EB2820AC1',
+                tokenId: 2,
             };
 
             when(repository.findOne(objectContaining(option))).thenReturn(new Promise((res) => {
@@ -53,7 +55,7 @@ describe('AuctionService', () => {
             const repositoryImpl: IAuctionRepository = instance(repository);
 
             service = new AuctionService(repositoryImpl);
-            const auction = await service.findOneByGene('EB2820AC1');
+            const auction = await service.findOneByTokenId(2);
             expect(auction).toEqual(mockSpecialAuction);
         });
     });
@@ -71,6 +73,7 @@ describe('AuctionService', () => {
 
             auctionDto = new AuctionDto(
                 'AA239BE27',
+                1,
                 'user1',
                 60,
                 AuctionType.SALE_AUCTION,
@@ -94,6 +97,7 @@ describe('AuctionService', () => {
 
             auctionDto = new AuctionDto(
                 'EB2820AC1',
+                2,
                 'user2',
                 120,
                 AuctionType.SPECIAL_AUCTION,
@@ -116,7 +120,7 @@ describe('AuctionService', () => {
             }));
 
             const option = {
-                gene: 'EB2820AC1',
+                tokenId: 2,
             };
 
             when(repository.findOne(objectContaining(option))).thenReturn(new Promise((res) => {
@@ -126,7 +130,7 @@ describe('AuctionService', () => {
             const repositoryImpl: IAuctionRepository = instance(repository);
 
             service = new AuctionService(repositoryImpl);
-            await service.updateWinner('EB2820AC1', 'user4', 5000);
+            await service.updateWinner(2, 'user4', 5000);
 
             const auction = await service.findOne(1);
             expect(auction.winnerId).toEqual('user4');
@@ -142,7 +146,7 @@ describe('AuctionService', () => {
             }));
 
             const option = {
-                gene: 'EB2820AC1',
+                tokenId: 2,
             };
 
             when(repository.findOne(objectContaining(option))).thenReturn(new Promise((res) => {
@@ -152,7 +156,7 @@ describe('AuctionService', () => {
             const repositoryImpl: IAuctionRepository = instance(repository);
 
             service = new AuctionService(repositoryImpl);
-            await service.cancelAuction('EB2820AC1');
+            await service.cancelAuction(2);
 
             const auction = await service.findOne(1);
             expect(auction.endType).toEqual(AuctionEndType.CANCEL);
@@ -168,7 +172,7 @@ describe('AuctionService', () => {
             }));
 
             const option = {
-                gene: 'EB2820AC1',
+                tokenId: 2,
             };
 
             when(repository.findOne(objectContaining(option))).thenReturn(new Promise((res) => {
@@ -178,7 +182,7 @@ describe('AuctionService', () => {
             const repositoryImpl: IAuctionRepository = instance(repository);
 
             service = new AuctionService(repositoryImpl);
-            await service.endAuction('EB2820AC1');
+            await service.endAuction(2);
 
             const auction = await service.findOne(1);
             expect(auction.endType).toEqual(AuctionEndType.SUCCESS);

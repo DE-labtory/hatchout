@@ -13,7 +13,7 @@ describe('ValidationServiceImpl', () => {
             return '';
         }
     }
-    const mockBridgeService = mock(BrideServiceImpl);
+    const mockBridgeService: BrideServiceImpl = mock(BrideServiceImpl);
     let service: ValidationServiceImpl;
 
     describe('dependency resolve', () => {

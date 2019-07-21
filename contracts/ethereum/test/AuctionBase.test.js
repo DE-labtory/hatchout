@@ -69,7 +69,7 @@ contract('MockAuctionBase', accounts => {
     });
 
     it('emits AuctionCreated event when auction created', async () => {
-      await expectEvent.inLogs(receipt.logs, 'AuctionCreated', { gene: geneOfGhost, duration: auctionDuration});
+      await expectEvent.inLogs(receipt.logs, 'AuctionCreated', { tokenId: ghostID, duration: auctionDuration});
     });
 
     it('successfully creates and adds auction', async () => {
@@ -99,7 +99,7 @@ contract('MockAuctionBase', accounts => {
     });
 
     it('emits AuctionCancelled event when successfully cancels auction', async () => {
-      await expectEvent.inLogs(receipt.logs, 'AuctionCancelled', {gene: geneOfGhost});
+      await expectEvent.inLogs(receipt.logs, 'AuctionCancelled', {tokenId: ghostID});
     });
 
     it('successfully cancels auction', async () => {
@@ -151,7 +151,7 @@ contract('MockAuctionBase', accounts => {
     });
 
     it('emits BidderCreated event when adds bidder', async () => {
-      await expectEvent.inLogs(receipt.logs, 'BidderCreated', {gene: geneOfGhost, bidder: bidder});
+      await expectEvent.inLogs(receipt.logs, 'BidderCreated', {tokenId: ghostID, bidder: bidder});
     });
 
     it('successfully adds bidder', async () => {
@@ -193,7 +193,7 @@ contract('MockAuctionBase', accounts => {
     it('emits BidAmountUpdated event when successfully update bidder\'s amount', async () => {
       receipt = await AuctionBase.updateBidAmount(ghostID, bidder, newBidAmount);
 
-      await expectEvent.inLogs(receipt.logs, 'BidAmountUpdated', {gene: geneOfGhost, bidder: bidder, newAmount: newBidAmount});
+      await expectEvent.inLogs(receipt.logs, 'BidAmountUpdated', {tokenId: ghostID, bidder: bidder, newAmount: newBidAmount});
     });
 
     it('successfully updates bidder\'s amount', async () => {
@@ -303,7 +303,7 @@ contract('MockAuctionBase', accounts => {
 
       receipt = await AuctionBase.endAuction(ghostID);
 
-      await expectEvent.inLogs(receipt.logs, 'AuctionCancelled', {gene: geneOfGhost});
+      await expectEvent.inLogs(receipt.logs, 'AuctionCancelled', {tokenId: ghostID});
     });
 
     it('emits AuctionSuccessful event when successfully finished auction', async () => {
@@ -323,7 +323,7 @@ contract('MockAuctionBase', accounts => {
 
       receipt = await AuctionBase.endAuction(ghostID);
 
-      await expectEvent.inLogs(receipt.logs, 'AuctionSuccessful', {gene: geneOfGhost, maxPrice: bidAmount, winner: bidder});
+      await expectEvent.inLogs(receipt.logs, 'AuctionSuccessful', {tokenId: ghostID, maxPrice: bidAmount, winner: bidder});
     });
 
     it('successfully finished auction', async () => {
