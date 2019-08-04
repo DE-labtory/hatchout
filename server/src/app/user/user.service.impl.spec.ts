@@ -130,6 +130,7 @@ describe('UserServiceImpl', () => {
 
         it('should return user with increased point', async () => {
             when(mockRepository.findById(id)).thenReturn(new Promise((resolve => resolve(user))));
+            when(mockRepository.save(user)).thenReturn(new Promise((resolve) => resolve(user)));
             service = new UserServiceImpl(instance(mockRepository));
 
             const userReturned = await service.increasePoint(id, validAmount);
@@ -164,6 +165,7 @@ describe('UserServiceImpl', () => {
         it('should return user with increased level', async () => {
             user = new User(address, name, point);
             when(mockRepository.findById(id)).thenReturn(new Promise((resolve => resolve(user))));
+            when(mockRepository.save(user)).thenReturn(new Promise((resolve) => resolve(user)));
             service = new UserServiceImpl(instance(mockRepository));
 
             const userReturned = await service.decreasePoint(id, validAmount);
@@ -207,6 +209,7 @@ describe('UserServiceImpl', () => {
 
         it('should return user with increased level', async () => {
             when(mockRepository.findById(id)).thenReturn(new Promise((resolve => resolve(user))));
+            when(mockRepository.save(user)).thenReturn(new Promise((resolve) => resolve(user)));
             service = new UserServiceImpl(instance(mockRepository));
 
             const userReturned = await service.increaseLevel(id, validAmount);
