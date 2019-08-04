@@ -11,29 +11,27 @@ describe('User.Entity', () => {
     });
 
     describe('#constructor()', () => {
-        it('should be defined', async () => {
-            await expect(user).toBeDefined();
+        it('should be defined',  () => {
+            expect(user).toBeDefined();
         });
     });
     describe('#getPoint()', () => {
         const point = 100;
 
-        it('should return point', async () => {
+        it('should return point',  () => {
             user = new User(address, name, point);
-            await expect(user.getPoint()).toBe(point);
+            expect(user.getPoint()).toBe(point);
         });
     });
     describe('#increasePoint()',  () => {
         const validAmount = 10;
-        it('should return user with increased point',  async () => {
-            await expect(user.increasePoint(validAmount)).toBeDefined();
-            await expect(user.getPoint()).toBe(validAmount);
+        it('should return user with increased point',   () => {
+            expect(user.increasePoint(validAmount)).toBeDefined();
+            expect(user.getPoint()).toBe(validAmount);
         });
-        it('should throw ValidationException when amount is negative', async () => {
+        it('should throw ValidationException when amount is negative', () => {
             const invalidAmount = -1;
-            await expect(user.increasePoint(invalidAmount))
-                .rejects
-                .toThrowError(ValidationException);
+            expect(() => user.increasePoint(invalidAmount)).toThrowError(ValidationException);
         });
     });
     describe('#decreasePoint()', () => {
@@ -45,50 +43,42 @@ describe('User.Entity', () => {
             user = new User(address, name, point);
         });
 
-        it('should return user with decreased point', async () => {
-            await expect(await user.decreasePoint(validAmount)).toBeDefined();
-            await expect(user.getPoint()).toBe(point - validAmount);
+        it('should return user with decreased point',  () => {
+            expect(user.decreasePoint(validAmount)).toBeDefined();
+            expect(user.getPoint()).toBe(point - validAmount);
         });
-        it('should throw ValidationException when amount is negative', async () => {
+        it('should throw ValidationException when amount is negative',  () => {
             invalidAmount = -1;
-            await expect(user.decreasePoint(invalidAmount))
-                .rejects
-                .toThrowError(ValidationException);
+            expect(() => user.decreasePoint(invalidAmount)).toThrowError(ValidationException);
         });
-        it('should throw ValidationException when point becomes less than MIN_POINT', async () => {
+        it('should throw ValidationException when point becomes less than MIN_POINT',  () => {
             invalidAmount = 1000;
-            await expect(user.decreasePoint(invalidAmount))
-                .rejects
-                .toThrowError(ValidationException);
+            expect(() => user.decreasePoint(invalidAmount)).toThrowError(ValidationException);
         });
     });
     describe( '#getLevel()', () => {
         const level = 10;
 
-        it('should return level',  async () => {
+        it('should return level',   () => {
             user = new User(address, name, undefined, level);
-            await expect(user.getLevel()).toBe(level);
+            expect(user.getLevel()).toBe(level);
         });
     });
     describe('#increaseLevel()',  () => {
         const validAmount = 10;
         let invalidAmount: number;
 
-        it('should return user with increased level', async () => {
-            await expect(await user.increaseLevel(validAmount)).toBeDefined();
-            await expect(user.getLevel()).toBe(validAmount);
+        it('should return user with increased level', () => {
+            expect(user.increaseLevel(validAmount)).toBeDefined();
+            expect(user.getLevel()).toBe(validAmount);
         });
-        it('should throw ValidationException when amount is negative', async () => {
+        it('should throw ValidationException when amount is negative', () => {
             invalidAmount = -1;
-            await expect(user.increaseLevel(invalidAmount))
-                .rejects
-                .toThrowError(ValidationException);
+            expect(() => user.increaseLevel(invalidAmount)).toThrowError(ValidationException);
         });
-        it('should throw ValidationException when level becomes more than MAX_LEVEL', async () => {
+        it('should throw ValidationException when level becomes more than MAX_LEVEL',  () => {
             invalidAmount = 1000;
-            await expect(user.increaseLevel(invalidAmount))
-                .rejects
-                .toThrowError(ValidationException);
+            expect(() => user.increaseLevel(invalidAmount)).toThrowError(ValidationException);
         });
     });
 });

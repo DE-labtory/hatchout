@@ -57,7 +57,7 @@ export class User {
     }
     public increasePoint(amount: number): User {
         if (amount < 0) {
-            throw new ValidationException('amount should be positive');
+          throw new ValidationException('amount should be positive');
         }
 
         this.point += amount;
