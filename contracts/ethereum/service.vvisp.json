@@ -1,0 +1,37 @@
+{
+  "serviceName": "Hatchout",
+  "variables" : {
+    "owner": "0xDA46CE389670437Aeb5d4a0752B88cf2d4597A4e"
+  },
+  "contracts": {
+    "GhostFactory": {
+      "path": "./contracts/GhostFactory.sol",
+      "name": "GhostFactory",
+      "constructorArguments": [
+        "${variables.owner}"
+      ]
+    },
+    "SpecialAuction": {
+      "path": "./contracts/SpecialAuction.sol",
+      "name": "SpecialAuction",
+      "constructorArguments": [
+        "${contracts.GhostFactory.address}"
+      ]
+    },
+    "SaleAuction": {
+      "path": "./contracts/SaleAuction.sol",
+      "name": "SaleAuction",
+      "constructorArguments": [
+        "${contracts.GhostFactory.address}"
+      ]
+    },
+    "GhostAuction": {
+      "path": "./contracts/GhostAuction.sol",
+      "name": "GhostAuction",
+      "constructorArguments": [
+        "${contracts.SpecialAuction.address}",
+        "${contracts.SaleAuction.address}"
+      ]
+    }
+  }
+}
