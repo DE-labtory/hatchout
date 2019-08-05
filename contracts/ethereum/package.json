@@ -11,9 +11,18 @@
   },
   "author": "",
   "license": "ISC",
+  "dependencies": {
+    "@types/web3": "^1.0.19",
+    "chai": "^4.2.0",
+    "package.json": "^2.0.1",
+    "web3": "^1.0.0-beta.55",
+    "web3-providers": "^1.0.0-beta.55"
+  },
   "devDependencies": {
     "@haechi-labs/vvisp-contracts": "^1.0.0",
     "@haechi-labs/vvisp-utils": "^1.0.0",
+    "@types/jest": "^23.3.13",
+    "@types/node": "^10.12.18",
     "babel-preset-env": "^1.7.0",
     "coveralls": "^3.0.1",
     "eth-gas-reporter": "^0.1.7",
@@ -28,7 +37,8 @@
     "solidity-coverage": "git+https://github.com/rotcivegaf/solidity-coverage.git#5875f5b7bc74d447f3312c9c0e9fc7814b482477",
     "solium": "^1.1.6",
     "truffle": "^5.0.0",
-    "web3": "^1.0.0-beta.55"
+    "ts-node": "^8.3.0",
+    "typescript": "^3.5.3"
   },
   "lint-staged": {
     "**/*.js": [
@@ -45,9 +55,5 @@
     "singleQuote": true,
     "tabWidth": 2,
     "printWidth": 80
-  },
-  "dependencies": {
-    "chai": "^4.2.0",
-    "package.json": "^2.0.1"
   }
 }

@@ -1,0 +1,25 @@
+{
+  "contracts": {
+    "GhostFactory": {
+      "name": "GhostFactory",
+      "address": "0xD5105E5E8be21d7be98f7D836F9c4f2BA677a03C",
+      "fileName": "GhostFactory.sol"
+    },
+    "SpecialAuction": {
+      "name": "SpecialAuction",
+      "address": "0xc76F8d8972219409d819091ec1A2Cb766DEd8271",
+      "fileName": "SpecialAuction.sol"
+    },
+    "SaleAuction": {
+      "name": "SaleAuction",
+      "address": "0x4331f93b7977ca99faBc6633Bc8349D474bA9878",
+      "fileName": "SaleAuction.sol"
+    },
+    "GhostAuction": {
+      "name": "GhostAuction",
+      "address": "0xE0D726Acd4616A6E8169df0f19E24f08fF819AcF",
+      "fileName": "GhostAuction.sol"
+    }
+  },
+  "serviceName": "Hatchout"
+}
