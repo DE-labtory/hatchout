@@ -22,6 +22,9 @@ module.exports = function(_contractAddr = '') {
       ceoAddress: function() {
         return contract.methods.ceoAddress().call();
       },
+      ghosts: function(input1, ) {
+        return contract.methods.ghosts(input1, ).call();
+      },
       owns: function(_owner, _tokenId, ) {
         return contract.methods.owns(_owner, _tokenId, ).call();
       },
