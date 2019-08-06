@@ -1,4 +1,5 @@
 import {TransactionReceipt} from "web3/types";
+import BN = require("bn.js");
 
 export interface BaseContract {
   at(address: string);
@@ -33,7 +34,7 @@ export interface GhostFactoryContract extends BaseContract {
 }
 
 export interface GhostFactoryContractMethod {
-  levelUp(owner: string, tokenId: string, signature: string): TransactionReceipt;
+  levelUp(owner: string, tokenId: string, signature: string, options?: any): TransactionReceipt;
 
   transferFrom(from: string, to: string, tokenId: string): TransactionReceipt;
 
@@ -61,3 +62,45 @@ export interface GhostAuctionContractMethod {
 export interface GhostAuctionContract extends BaseContract {
   methods: BaseMethod & GhostAuctionContractMethod;
 }
+
+export type Mixed =
+  | string
+  | number
+  | BN
+  | {
+  type: string;
+  value: string;
+}
+  | {
+  t: string;
+  v: string;
+};
+
+export type Unit =
+  | "noether"
+  | "wei"
+  | "kwei"
+  | "Kwei"
+  | "babbage"
+  | "femtoether"
+  | "mwei"
+  | "Mwei"
+  | "lovelace"
+  | "picoether"
+  | "gwei"
+  | "Gwei"
+  | "shannon"
+  | "nanoether"
+  | "nano"
+  | "szabo"
+  | "microether"
+  | "micro"
+  | "finney"
+  | "milliether"
+  | "milli"
+  | "ether"
+  | "kether"
+  | "grand"
+  | "mether"
+  | "gether"
+  | "tether";

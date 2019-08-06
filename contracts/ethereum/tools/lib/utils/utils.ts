@@ -1,5 +1,6 @@
 import Web3 = require("web3");
 import BN = require("bn.js");
+import {Mixed, Unit} from "../types";
 
 export default class Utils {
   private web3: Web3;
@@ -8,17 +9,34 @@ export default class Utils {
     this.web3 = web3;
   }
 
-  public async createSignature(gene: any): Promise<string> {
+  private async loadOwner(): Promise<string> {
     const defaultOwner = await this.web3.eth.accounts.wallet[0].address;
-    if (defaultOwner === undefined){
+    if (defaultOwner === undefined) {
       throw new Error('at least one wallet must exist');
     }
-    const hash = await this.web3.utils.soliditySha3(gene, defaultOwner);
+
+    return defaultOwner
+  }
+
+  public async createGeneSignature(gene: Mixed): Promise<string> {
+    return await this.createSignature(gene, await this.loadOwner())
+  }
+
+  public async createLevelUpSignature(tokenId: Mixed, level: Mixed): Promise<string> {
+    return await this.createSignature(tokenId, level)
+  }
+
+  private async createSignature(...val: Mixed[]): Promise<string> {
+    const defaultOwner = await this.loadOwner();
+    const hash = await this.web3.utils.soliditySha3(...val);
     return await this.web3.eth.sign(hash, defaultOwner);
   }
 
-  public async toBN(n: string): Promise<BN>{
-    // @ts-ignore
-    return new this.web3.utils.BN(n);
+  public toHexWei(val: string, unit?: Unit): string {
+    return '0x' + parseInt(this.web3.utils.toWei(val, unit)).toString(16);
+  }
+
+  public async toBN(n: string): Promise<BN> {
+    return this.web3.utils.toBN(n);
   }
 }

@@ -3,9 +3,10 @@ import HatchOut from "../lib/hatchOut";
 
 async function main() {
   try {
-    console.log('executing createEgg Transaction');
+    console.log('executing levelUp Transaction');
     const hatchOut = HatchOut.createFromConfig();
-    const gene = process.argv[2];
+    const tokenId = await hatchOut.utils.toBN(process.argv[2]);
+    const level = await hatchOut.utils.toBN(process.argv[3]);
     const owner = '0xDA46CE389670437Aeb5d4a0752B88cf2d4597A4e';
     const ghostFactoryContract: GhostFactoryContract = hatchOut
       .factory
@@ -13,15 +14,22 @@ async function main() {
 
     const signature = await hatchOut
       .utils
-      .createGeneSignature(gene);
+      .createLevelUpSignature(tokenId, level);
 
     const receipt = await ghostFactoryContract
       .methods
-      .createEgg(gene, owner, signature);
+      .levelUp(
+        owner,
+        tokenId.toString(),
+        signature,
+        {
+          value: hatchOut.utils.toHexWei("1", "szabo")
+        }
+      );
 
-    console.log(JSON.stringify(receipt,undefined,2));
+    console.log(JSON.stringify(receipt, undefined, 2));
   } catch (e) {
-    console.error(`failed to execute 'createEgg Transaction'\n`, e);
+    console.error(`failed to execute 'levelUp Transaction'\n`, e);
     process.exit(1);
   }
 }
