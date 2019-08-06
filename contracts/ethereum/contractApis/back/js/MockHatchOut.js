@@ -40,6 +40,9 @@ module.exports = function(_contractAddr = '') {
       getSaleAuctionAddress: function() {
         return contract.methods.getSaleAuctionAddress().call();
       },
+      ghosts: function(input1, ) {
+        return contract.methods.ghosts(input1, ).call();
+      },
       isSpecialAuction: function(_tokenId, ) {
         return contract.methods.isSpecialAuction(_tokenId, ).call();
       },

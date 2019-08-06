@@ -37,6 +37,9 @@ module.exports = function(_contractAddr = '') {
       totalSupply: function() {
         return contract.methods.totalSupply().call();
       },
+      ghosts: function(input1, ) {
+        return contract.methods.ghosts(input1, ).call();
+      },
       ownerOf: function(_tokenId, ) {
         return contract.methods.ownerOf(_tokenId, ).call();
       },

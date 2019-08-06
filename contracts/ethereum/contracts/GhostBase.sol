@@ -25,7 +25,7 @@ contract GhostBase is AccessControl {
     }
 
     // An array containing ghosts that exist. Index of this array is used as ghostId.
-    Ghost[] ghosts;
+    Ghost[] public ghosts;
 
     // mapping from ghostId to address of owner.
     mapping (uint256 => address) public ghostIndexToOwner;
