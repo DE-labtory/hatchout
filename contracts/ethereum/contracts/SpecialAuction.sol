@@ -19,12 +19,12 @@ contract SpecialAuction is AuctionBase {
         _escrow(_seller, _tokenId);
 
         Auction memory auction = Auction({
-            seller: _seller,
-            winner: address(0),
-            maxPrice: uint128(0),
+            seller : _seller,
+            winner : address(0),
+            maxPrice : uint128(0),
             // sumPrice: uint256(0),
-            duration: uint64(_duration),
-            startedAt: uint64(now)
+            duration : uint64(_duration),
+            startedAt : uint64(now)
             });
 
         // specialAuction's type is 1.

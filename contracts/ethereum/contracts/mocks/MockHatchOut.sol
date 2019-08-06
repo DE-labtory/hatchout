@@ -1,9 +1,9 @@
 pragma solidity ^0.5.0;
 
-import "../GhostAuction.sol";
+import "../HatchOut.sol";
 
-contract MockGhostAuction is GhostAuction {
-    constructor (address _specialAddress, address _saleAddress) public GhostAuction(_specialAddress, _saleAddress) {}
+contract MockHatchOut is HatchOut {
+    constructor (address payable _ceoAddress) public HatchOut(_ceoAddress){}
 
     function getSpecialAuctionAddress() external view returns (address) {
         return address(specialAuction);
