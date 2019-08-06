@@ -1,4 +1,4 @@
-import {GhostAuctionContract, GhostFactoryContract} from "../types";
+import {HatchOutContract} from "../types";
 
 export default class ContractFactory {
   private defaultPrivateKey!: string;
@@ -9,29 +9,16 @@ export default class ContractFactory {
     this.endpoint = endpoint;
   }
 
-  public createGhostContract(
+  public createHatchOutContract(
     contractAddress: string,
     privateKey: string = this.defaultPrivateKey
-  ): GhostFactoryContract {
-    const {GhostFactory} = require('../../../contractApis/back')(
+  ): HatchOutContract {
+    const {HatchOut} = require('../../../contractApis/back')(
       {
         from: privateKey,
       },
       this.endpoint,
     );
-    return new GhostFactory(contractAddress);
-  }
-
-  public createGhostAuction(
-    contractAddress: string,
-    privateKey: string = this.defaultPrivateKey
-  ): GhostAuctionContract {
-    const {GhostAuction} = require('../../../contractApis/back')(
-      {
-        from: privateKey,
-      },
-      this.endpoint,
-    );
-    return new GhostAuction(contractAddress);
+    return new HatchOut(contractAddress);
   }
 }

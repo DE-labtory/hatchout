@@ -20,6 +20,15 @@ function loadApis() {
   apis['GhostBase'] = require('./js/GhostBase.js');
   apis['GhostFactory'] = require('./js/GhostFactory.js');
   apis['GhostOwnership'] = require('./js/GhostOwnership.js');
+  apis['HatchOut'] = require('./js/HatchOut.js');
+  apis['MockAuctionBase'] = require('./js/MockAuctionBase.js');
+  apis['MockAuctionCreator'] = require('./js/MockAuctionCreator.js');
+  apis['MockGhostBase'] = require('./js/MockGhostBase.js');
+  apis['MockGhostFactory'] = require('./js/MockGhostFactory.js');
+  apis['MockGhostOwnership'] = require('./js/MockGhostOwnership.js');
+  apis['MockHatchOut'] = require('./js/MockHatchOut.js');
+  apis['MockSaleAuction'] = require('./js/MockSaleAuction.js');
+  apis['MockSpecialAuction'] = require('./js/MockSpecialAuction.js');
   apis['SaleAuction'] = require('./js/SaleAuction.js');
   apis['SpecialAuction'] = require('./js/SpecialAuction.js');
   return apis;

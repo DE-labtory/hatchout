@@ -1,6 +1,10 @@
 import {TransactionReceipt} from "web3/types";
 import BN = require("bn.js");
 
+export interface HatchOutContract extends BaseContract {
+  methods: BaseMethod & GhostAuctionContractMethod & GhostFactoryContractMethod
+}
+
 export interface BaseContract {
   at(address: string);
 
@@ -29,10 +33,6 @@ export interface BaseMethod {
   setLevelLimit(limit: number): TransactionReceipt;
 }
 
-export interface GhostFactoryContract extends BaseContract {
-  methods: BaseMethod & GhostFactoryContractMethod;
-}
-
 export interface GhostFactoryContractMethod {
   levelUp(owner: string, tokenId: string, signature: string, options?: any): TransactionReceipt;
 
@@ -57,10 +57,6 @@ export interface GhostAuctionContractMethod {
   createSaleAuction(tokenId: string, buyer: string, amount: string): TransactionReceipt;
 
   createSpecialAuction(tokenId: string): TransactionReceipt;
-}
-
-export interface GhostAuctionContract extends BaseContract {
-  methods: BaseMethod & GhostAuctionContractMethod;
 }
 
 export type Mixed =
