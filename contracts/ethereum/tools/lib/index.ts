@@ -1,2 +1,2 @@
 export * from './types'
-export * from './hatchout'
+export * from './hatchOut'
