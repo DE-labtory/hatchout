@@ -1,4 +1,4 @@
-import {GhostFactoryContract} from "../lib/types";
+import {HatchOutContract} from "../lib/types";
 import HatchOut from "../lib/hatchOut";
 
 async function main() {
@@ -8,15 +8,15 @@ async function main() {
     const tokenId = await hatchOut.utils.toBN(process.argv[2]);
     const level = await hatchOut.utils.toBN(process.argv[3]);
     const owner = '0xDA46CE389670437Aeb5d4a0752B88cf2d4597A4e';
-    const ghostFactoryContract: GhostFactoryContract = hatchOut
+    const hatchOutContract: HatchOutContract = hatchOut
       .factory
-      .createDefaultGhostFactoryContract();
+      .createDefaultHatchOutContract();
 
     const signature = await hatchOut
       .utils
       .createLevelUpSignature(tokenId, level);
 
-    const receipt = await ghostFactoryContract
+    const receipt = await hatchOutContract
       .methods
       .levelUp(
         owner,

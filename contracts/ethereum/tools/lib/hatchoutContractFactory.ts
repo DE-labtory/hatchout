@@ -1,47 +1,30 @@
 import ContractFactory from "./factories/contractFactory";
 import VvispStateSupplier from "./suppliers/vvispStateSupplier";
-import {GhostAuctionContract, GhostFactoryContract} from "./types";
+import {HatchOutContract} from "./types";
 
 export default class HatchoutContractFactory {
   private contractFactory: ContractFactory;
   private vvispStateSupplier: VvispStateSupplier;
 
-  constructor(privateKey?: string, endpoint?: string){
+  constructor(privateKey?: string, endpoint?: string) {
     this.contractFactory = new ContractFactory(privateKey, endpoint);
     this.vvispStateSupplier = new VvispStateSupplier();
   }
 
-  public createDefaultGhostFactoryContract(): GhostFactoryContract {
+  public createDefaultHatchOutContract(): HatchOutContract {
     return this.contractFactory
-      .createGhostContract(
+      .createHatchOutContract(
         this.vvispStateSupplier.loadContractAddress(
-          "GhostFactory",
+          "HatchOut",
         )
       );
   }
 
-  public createGhostAuctionContractFromVvispState(): GhostAuctionContract {
-    return this.contractFactory
-      .createGhostAuction(
-        this.vvispStateSupplier.loadContractAddress(
-          "GhostAuction",
-        ),
-      );
-  }
-
-  public createGhostFactoryContract(
+  public createHatchOutContract(
     contractAddress: string,
     privateKey?: string
-  ): GhostFactoryContract {
+  ): HatchOutContract {
     return this.contractFactory
-      .createGhostContract(contractAddress, privateKey);
-  }
-
-  public createGhostAuctionContract(
-    contractAddress: string,
-    privateKey?: string
-  ): GhostAuctionContract {
-    return this.contractFactory
-      .createGhostAuction(contractAddress, privateKey);
+      .createHatchOutContract(contractAddress, privateKey);
   }
 }
