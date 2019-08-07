@@ -1,6 +1,28 @@
 import {TransactionReceipt} from "web3/types";
 import BN = require("bn.js");
 
+export interface HatchOutMethod {
+  getGhost(index: string): Ghost;
+
+  getGhosts(indices: number[]): Ghost[];
+
+  levelUp(owner: string, tokenId: string, signature: string, options?: any): TransactionReceipt;
+
+  setSpecialAuctionAddress(address: string): TransactionReceipt;
+
+  setSaleAuctionAddress(address: string): TransactionReceipt;
+
+  createSaleAuction(tokenId: string, buyer: string, amount: string): TransactionReceipt;
+
+  createSpecialAuction(tokenId: string): TransactionReceipt;
+}
+
+export interface Ghost {
+  gene: string;
+  birthTime: string;
+  level: string;
+}
+
 export interface HatchOutContract extends BaseContract {
   methods: BaseMethod & GhostAuctionContractMethod & GhostFactoryContractMethod
 }
@@ -34,6 +56,10 @@ export interface BaseMethod {
 }
 
 export interface GhostFactoryContractMethod {
+  ghosts(index: string): Ghost;
+
+  getGhosts(indices: string[]): [string[], string[], string[]]
+
   levelUp(owner: string, tokenId: string, signature: string, options?: any): TransactionReceipt;
 
   transferFrom(from: string, to: string, tokenId: string): TransactionReceipt;
