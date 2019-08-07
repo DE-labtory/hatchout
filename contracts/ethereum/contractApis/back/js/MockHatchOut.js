@@ -34,6 +34,9 @@ module.exports = function(_contractAddr = '') {
       specialAuction: function() {
         return contract.methods.specialAuction().call();
       },
+      getGhosts: function(indexes, ) {
+        return contract.methods.getGhosts(indexes, ).call();
+      },
       totalSupply: function() {
         return contract.methods.totalSupply().call();
       },

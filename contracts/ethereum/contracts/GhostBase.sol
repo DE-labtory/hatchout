@@ -28,13 +28,13 @@ contract GhostBase is AccessControl {
     Ghost[] public ghosts;
 
     // mapping from ghostId to address of owner.
-    mapping (uint256 => address) public ghostIndexToOwner;
+    mapping(uint256 => address) public ghostIndexToOwner;
 
     // mapping from ghostId to address that has been approved to call transferfrom().
-    mapping (uint256 => address) public ghostIndexToApproved;
+    mapping(uint256 => address) public ghostIndexToApproved;
 
     // mapping from address of owner to the number of tokens owned by owner.
-    mapping (address => uint256) ownershipTokenCount;
+    mapping(address => uint256) ownershipTokenCount;
 
     uint8 levelLimit = 3;
 
@@ -57,10 +57,10 @@ contract GhostBase is AccessControl {
     //  Given owner owns this egg.
     function _createEgg(uint64 _gene, address _owner) internal {
         Ghost memory _ghost = Ghost({
-            gene: _gene,
-            birthTime: uint64(now),
-            level: 0
-        });
+            gene : _gene,
+            birthTime : uint64(now),
+            level : 0
+            });
 
         uint256 newGhostId = ghosts.push(_ghost) - 1;
         ghostIndexToOwner[newGhostId] = _owner;
@@ -82,5 +82,20 @@ contract GhostBase is AccessControl {
         require(_levelLimit > 0);
 
         levelLimit = uint8(_levelLimit);
+    }
+
+    function getGhosts(uint[] memory indexes) public view returns (uint64[] memory, uint64[] memory, uint8[] memory){
+        uint64[] memory genes = new uint64[](indexes.length);
+        uint64[] memory birthTimes = new uint64[](indexes.length);
+        uint8[] memory levels = new uint8[](indexes.length);
+
+        for (uint i = 0; i < indexes.length; i++) {
+            Ghost storage ghost = ghosts[indexes[i]];
+            genes[i] = ghost.gene;
+            birthTimes[i] = ghost.birthTime;
+            levels[i] = ghost.level;
+        }
+
+        return (genes, birthTimes, levels);
     }
 }

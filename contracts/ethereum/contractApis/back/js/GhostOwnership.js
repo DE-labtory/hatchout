@@ -31,6 +31,9 @@ module.exports = function(_contractAddr = '') {
       getGene: function(_tokenId, ) {
         return contract.methods.getGene(_tokenId, ).call();
       },
+      getGhosts: function(indexes, ) {
+        return contract.methods.getGhosts(indexes, ).call();
+      },
       totalSupply: function() {
         return contract.methods.totalSupply().call();
       },
