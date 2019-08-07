@@ -1,4 +1,4 @@
-import HatchoutContractFactory from "./hatchoutContractFactory";
+import HatchoutContractFactory from "./factories/hatchoutContractFactory";
 import * as fs from "fs";
 import Web3 = require("web3");
 import Utils from "./utils/utils";
@@ -25,16 +25,26 @@ export default class HatchOut {
     );
   }
 
-  public static create(privateKey: string, endpoint: string): HatchOut {
-    return new HatchOut(privateKey, endpoint);
+  public static create(privateKey: string, endpoint: string, address: string): HatchOut {
+    return new HatchOut(privateKey, endpoint, address);
   }
 
-  constructor(privateKey: string, endpoint: string) {
+  constructor(privateKey: string, endpoint: string, address?: string) {
     this.web3 = new Web3(endpoint);
-    this.utils = new Utils(this.web3);
     this.web3.eth.accounts.wallet.add(privateKey);
+    this.utils = new Utils(this.web3);
+    this.methods = (new MethodProxy(
+        this,
+        new MethodFactory(this.resolveContract(privateKey, endpoint, address))) as any
+    );
+  }
+
+  private resolveContract(privateKey: string, endpoint: string, address?: string): HatchOutContract {
     this.factory = new HatchoutContractFactory(privateKey, endpoint);
-    this.contract = this.factory.createDefaultHatchOutContract();
-    this.methods = (new MethodProxy(this, new MethodFactory(this.contract)) as any);
+    if (address == undefined) {
+      return this.factory.createDefaultHatchOutContract();
+    } else {
+      return this.factory.createHatchOutContract(address, privateKey);
+    }
   }
 }
