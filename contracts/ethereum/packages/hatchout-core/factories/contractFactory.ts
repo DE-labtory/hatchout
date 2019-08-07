@@ -13,7 +13,7 @@ export default class ContractFactory {
     contractAddress: string,
     privateKey: string = this.defaultPrivateKey
   ): HatchOutContract {
-    const {HatchOut} = require('../../../contractApis/back')(
+    const {HatchOut} = require('../../../contractApis/back/index')(
       {
         from: privateKey,
       },

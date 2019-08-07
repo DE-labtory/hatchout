@@ -3,7 +3,7 @@ import * as fs from "fs";
 import Web3 = require("web3");
 import Utils from "./utils/utils";
 import {HatchOutContract, HatchOutMethod} from "./types";
-import MethodProxy from "./proxy/MethodProxy";
+import MethodProxy from "./proxy/methodProxy";
 import MethodFactory from "./factories/methodFactory";
 
 export default class HatchOut {

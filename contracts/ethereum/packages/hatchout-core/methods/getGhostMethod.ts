@@ -8,7 +8,6 @@ export default class GetGhostMethod extends AbstractMethod {
   }
 
   afterExecution(result: any): any {
-    console.log(result);
     if (result.gene === undefined && result.level === undefined && result.birthTime === undefined) {
       throw new Error(`invalid ghost format error: ${result}`)
     }

@@ -1,5 +1,5 @@
 import {HatchOutContract} from "../types";
-import cloneDeep from 'lodash/cloneDeep';
+import {cloneDeep} from 'lodash';
 
 export default abstract class AbstractMethod {
   private readonly method: string;
