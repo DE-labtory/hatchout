@@ -1,6 +1,6 @@
-const { BN, constants, expectEvent, shouldFail } = require('openzeppelin-test-helpers');
+const {BN, constants, expectEvent, shouldFail} = require('openzeppelin-test-helpers');
 
-const { expect } = require('chai');
+const {expect} = require('chai');
 
 const MockGhostBase = artifacts.require('mocks/MockGhostBase');
 
@@ -26,7 +26,7 @@ contract('MockGhostBase', accounts => {
     });
 
     it('emit Birth event on successful creation egg of ghost', async () => {
-      await expectEvent.inLogs(receipt.logs, 'Birth', { owner: owner, tokenId: ghostID, gene: geneOfGhost });
+      await expectEvent.inLogs(receipt.logs, 'Birth', {owner: owner, tokenId: ghostID, gene: geneOfGhost});
     });
 
     it('updates ghost\'s owner on successful creation', async () => {
@@ -55,7 +55,7 @@ contract('MockGhostBase', accounts => {
     });
 
     it('emit LevelUp event on successful level increment', async () => {
-      await expectEvent.inLogs(receipt.logs, 'LevelUp', { owner: owner, gene: geneOfGhost, level: levelOfGhostID});
+      await expectEvent.inLogs(receipt.logs, 'LevelUp', {owner: owner, gene: geneOfGhost, level: levelOfGhostID});
     });
 
     it('updates ghost\'s level on successful LevelUp event', async () => {
@@ -100,6 +100,28 @@ contract('MockGhostBase', accounts => {
       await GhostBase.setLevelLimit(levelLimit, {from: ceo});
 
       expect(await GhostBase.getLevelLimit()).to.be.bignumber.equal(levelLimit);
+    });
+  });
+
+  describe('#getGhosts()', () => {
+    beforeEach(async () => {
+      for (let i = 0; i < 10; i++) {
+        await GhostBase.createEgg(new BN(i), owner);
+      }
+    });
+
+    it('return ghosts with the corresponding indices', async () => {
+      const result = await GhostBase.getGhosts([0, 1, 2]);
+      const genes = result['0'];
+      const levels = result['2'];
+
+      expect(genes.length).to.be.equal(3);
+      expect(levels.length).to.be.equal(3);
+
+      for (let i = 0; i < genes.length; i++) {
+        expect(genes[i].toString()).to.deep.equal(new BN(i).toString());
+        expect(levels[i].toString()).to.deep.equal(new BN(0).toString());
+      }
     });
   });
 });

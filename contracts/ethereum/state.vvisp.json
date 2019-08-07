@@ -2,17 +2,17 @@
   "contracts": {
     "HatchOut": {
       "name": "HatchOut",
-      "address": "0xC118eA5C3fAeD0797a95BF3f3FdFAb836c55989e",
+      "address": "0x74B6D0E26EDD2A73113b3DEb3aFbF932FDb34a31",
       "fileName": "HatchOut.sol"
     },
     "SpecialAuction": {
       "name": "SpecialAuction",
-      "address": "0x14f916CBa9FD525CD8B7AFb38Ec7435df9D64762",
+      "address": "0x8Cef3f931c6A8Bf6eC972B8f0939222E34b86036",
       "fileName": "SpecialAuction.sol"
     },
     "SaleAuction": {
       "name": "SaleAuction",
-      "address": "0x00d669fa9431F3952764C3D4dfB2585988688a7a",
+      "address": "0x0Bb58f5deE40CB5c3Fc3Af923a167352d6D89524",
       "fileName": "SaleAuction.sol"
     }
   },
