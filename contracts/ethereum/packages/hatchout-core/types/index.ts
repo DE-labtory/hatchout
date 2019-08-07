@@ -15,6 +15,8 @@ export interface HatchOutMethod {
   createSaleAuction(tokenId: string, buyer: string, amount: string): TransactionReceipt;
 
   createSpecialAuction(tokenId: string): TransactionReceipt;
+
+  totalSupply(): number;
 }
 
 export interface Ghost {
@@ -58,7 +60,7 @@ export interface BaseMethod {
 export interface GhostFactoryContractMethod {
   ghosts(index: string): Ghost;
 
-  getGhosts(indices: string[]): [string[], string[], string[]]
+  getGhosts(indices: number[]): [string[], string[], string[]]
 
   levelUp(owner: string, tokenId: string, signature: string, options?: any): TransactionReceipt;
 
