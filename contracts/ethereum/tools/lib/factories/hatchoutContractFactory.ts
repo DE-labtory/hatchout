@@ -1,6 +1,6 @@
-import ContractFactory from "./factories/contractFactory";
-import VvispStateSupplier from "./suppliers/vvispStateSupplier";
-import {HatchOutContract} from "./types";
+import ContractFactory from "./contractFactory";
+import VvispStateSupplier from "../suppliers/vvispStateSupplier";
+import {HatchOutContract} from "../types";
 
 export default class HatchoutContractFactory {
   private contractFactory: ContractFactory;
