@@ -7,6 +7,7 @@ import {
   GetGhostsMethod,
   LevelUpMethod
 } from "../methods";
+import TotalSupplyMethod from "../methods/totalSupplyMethod";
 
 export default class MethodFactory {
   private readonly methods: any;
@@ -21,6 +22,7 @@ export default class MethodFactory {
       getGhost: GetGhostMethod,
       levelUp: LevelUpMethod,
       getGhosts: GetGhostsMethod,
+      totalSupply: TotalSupplyMethod,
     };
   }
 
