@@ -12,7 +12,7 @@ import * as assert from 'assert';
 describe('UserController', () => {
   let app: INestApplication;
   const initUserFirst = {id: 1, address: 'firstAddress', name: 'firstName', point: 10, level: 0};
-  const initUserSecond = {id: 2, address: 'secondAddress', name: 'secondName', point: 0, level: 0};
+  const initUserSecond = {id: 2, address: 'secondAddress', name: 'secondName', point: 10, level: 0};
 
   beforeAll(async () => {
     ConfigService.rootPath = path.resolve(__dirname, '../../src');
@@ -139,7 +139,6 @@ describe('UserController', () => {
     it('should return 200', () => {
       validId = initUserFirst.id;
       url = '/users/' + validId + '/increase-point?amount=' + validAmount;
-
       return request(app.getHttpServer())
         .put(url)
         .expect(200)
@@ -176,24 +175,26 @@ describe('UserController', () => {
     let url: string;
     let validId: number;
     let invalidId: number;
-    const amount = 1;
+    let validAmount: number;
     let invalidAmount: number;
 
     it('should return 200', () => {
-      validId = initUserFirst.id;
-      url = '/users/' + validId + '/decrease-point?amount=' + amount;
+      validId = initUserSecond.id;
+      validAmount = 1;
+      url = '/users/' + validId + '/decrease-point?amount=' + validAmount;
 
       return request(app.getHttpServer())
         .put(url)
         .expect(200)
         .then(response => {
-          assert.strictEqual(response.body.address, initUserFirst.address);
-          assert.strictEqual(response.body.point, initUserFirst.point - amount);
+          assert.strictEqual(response.body.address, initUserSecond.address);
+          assert.strictEqual(response.body.point, initUserSecond.point - validAmount);
         });
     });
     it('should return 404 with invalid id', () => {
       invalidId = 100;
-      url = '/users/' + invalidId + '/decrease-point?amount=' + amount;
+      validAmount = 1;
+      url = '/users/' + invalidId + '/decrease-point?amount=' + validAmount;
 
       return request(app.getHttpServer())
         .put(url)
@@ -203,7 +204,7 @@ describe('UserController', () => {
         });
     });
     it('should return 422 when amount is negative', () => {
-      validId = initUserFirst.id;
+      validId = initUserSecond.id;
       invalidAmount = -1;
       url = '/users/' + validId + '/decrease-point?amount=' + invalidAmount;
       return request(app.getHttpServer())
@@ -215,7 +216,8 @@ describe('UserController', () => {
     });
     it('should return 422 when point becomes less than MIN_POINT', () => {
       invalidId = initUserSecond.id;
-      url = '/users/' + invalidId + '/decrease-point?amount=' + amount;
+      invalidAmount = initUserSecond.point + 1;
+      url = '/users/' + invalidId + '/decrease-point?amount=' + invalidAmount;
 
       return request(app.getHttpServer())
         .put(url)
