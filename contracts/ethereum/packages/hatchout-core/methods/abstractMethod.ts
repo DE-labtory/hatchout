@@ -18,7 +18,7 @@ export default abstract class AbstractMethod {
       const result = await this.contract.methods[this.method](...parameters);
       return this.afterExecution(result);
     } catch (e) {
-      throw new Error(`failed to execute ${this.method} transaction`)
+      throw new Error(`failed to execute ${this.method} transaction: ${e.message}`)
     }
   }
 

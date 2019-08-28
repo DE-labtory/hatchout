@@ -9,7 +9,7 @@ export default class Utils {
     this.web3 = web3;
   }
 
-  private async loadOwner(): Promise<string> {
+  public async loadOwnerAddress(): Promise<string> {
     const defaultOwner = await this.web3.eth.accounts.wallet[0].address;
     if (defaultOwner === undefined) {
       throw new Error('at least one wallet must exist');
@@ -19,7 +19,7 @@ export default class Utils {
   }
 
   public async createGeneSignature(gene: Mixed): Promise<string> {
-    return await this.createSignature(gene, await this.loadOwner())
+    return await this.createSignature(gene, await this.loadOwnerAddress())
   }
 
   public async createLevelUpSignature(tokenId: Mixed, level: Mixed): Promise<string> {
@@ -27,7 +27,7 @@ export default class Utils {
   }
 
   private async createSignature(...val: Mixed[]): Promise<string> {
-    const defaultOwner = await this.loadOwner();
+    const defaultOwner = await this.loadOwnerAddress();
     const hash = await this.web3.utils.soliditySha3(...val);
     return await this.web3.eth.sign(hash, defaultOwner);
   }
