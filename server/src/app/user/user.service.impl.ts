@@ -1,73 +1,69 @@
-import {Inject, Injectable} from '@nestjs/common';
+import {Injectable, NotAcceptableException, NotFoundException} from '@nestjs/common';
 import {UserService} from './user.service';
-import {UserDto} from '../../domain/user/dto/user.dto';
 import {User} from '../../domain/user/user.entity';
 import {DeleteResult} from 'typeorm';
-import {IUserRepository} from '../../port/persistence/repository/user.repository';
+import {InjectRepository} from '@nestjs/typeorm';
+import {InvalidParameterException} from '../../domain/exception/InvalidParameterException';
+import {IUserRepository} from '../../domain/user/user.repository';
 
 @Injectable()
 export class UserServiceImpl implements UserService {
+    constructor(@InjectRepository(User) private userRepository: IUserRepository) {}
 
-    constructor(@Inject('IUserRepository') private userRepository: IUserRepository) {}
+    async getByAddress(address: string): Promise<User> {
+        return await this.userRepository.findByAddress(address);
+    }
 
     async get(id: number): Promise<User> {
-        return await this.userRepository.findById(id);
+        const user = await this.userRepository.findById(id);
+        if (user === undefined) {
+            throw new NotFoundException('user with the id is not found');
+        }
+        return user;
     }
-    async create(userDto: UserDto): Promise<User> {
-        if (userDto.address === undefined) {
-            throw new Error('address should be defined');
+
+    async create(address: string, name: string): Promise<User> {
+        if (address === undefined) {
+            throw new InvalidParameterException('address should be defined');
         }
-        if (userDto.name === undefined) {
-            throw new Error('name should be defined');
+        if (name === undefined) {
+            throw new InvalidParameterException('name should be defined');
         }
-        const userRetrieved = await this.userRepository.findByAddress(userDto.address);
+        const userRetrieved = await this.userRepository.findByAddress(address);
         if (userRetrieved !== undefined) {
-            throw new Error('address is already registered');
+            throw new NotAcceptableException('address is already registered');
         }
 
-        const user = new User(userDto.address, userDto.name);
+        const user = new User(address, name);
         return await this.userRepository.save(user);
     }
+
     async delete(id: number): Promise<DeleteResult> {
         return await this.userRepository.delete(id);
     }
+
     async increasePoint(id: number, amount: number): Promise<User> {
-        let user: User;
-        user = await this.userRepository.findById(id);
+        const user = await this.userRepository.findById(id);
         if (user === undefined) {
-            throw new Error('user with the id is not found');
+            throw new NotFoundException('user with the id is not found');
         }
 
-        return user.increasePoint(amount);
+        return await this.userRepository.save(user.increasePoint(amount));
     }
     async decreasePoint(id: number, amount: number): Promise<User> {
-        let user: User;
-        user = await this.userRepository.findById(id);
+        const user = await this.userRepository.findById(id);
         if (user === undefined) {
-            throw new Error('user with the id is not found');
+            throw new NotFoundException('user with the id is not found');
         }
 
-        let errors: Error[];
-        errors = user.canDecreasePoint(amount);
-        if (errors.length !== 0) {
-            throw new Error('can not decrease point');
-        }
-
-        return await user.decreasePoint(amount);
+        return await this.userRepository.save(user.decreasePoint(amount));
     }
     async increaseLevel(id: number, amount: number): Promise<User> {
-        let user: User;
-        user = await this.userRepository.findById(id);
+        const user = await this.userRepository.findById(id);
         if (user === undefined) {
-            throw new Error('user with the id is not found');
+            throw new NotFoundException('user with the id is not found');
         }
 
-        let errors: Error[];
-        errors = user.canIncreaseLevel(amount);
-        if ( errors.length !== 0) {
-            throw new Error('can not increase level');
-        }
-
-        return await user.increaseLevel(amount);
+        return await this.userRepository.save(user.increaseLevel(amount));
     }
 }

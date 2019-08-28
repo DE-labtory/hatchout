@@ -22,15 +22,23 @@
   "dependencies": {
     "@nestjs/common": "^6.0.0",
     "@nestjs/core": "^6.0.0",
+    "@nestjs/jwt": "^6.1.1",
+    "@nestjs/passport": "^6.1.0",
     "@nestjs/platform-express": "^6.0.0",
     "@nestjs/typeorm": "^6.1.1",
     "class-validator": "^0.9.1",
+    "mysql": "^2.17.1",
     "nestjs-config": "^1.4.0",
+    "nestjs-typeorm-paginate": "^0.1.7",
+    "passport": "^0.4.0",
+    "passport-jwt": "^4.0.0",
+    "pg": "^7.11.0",
     "reflect-metadata": "^0.1.12",
     "rimraf": "^2.6.2",
     "rxjs": "^6.3.3",
     "typeorm": "^0.2.17",
-    "web3": "^1.0.0-beta.55"
+    "web3": "^1.0.0-beta.55",
+    "web3-providers": "^1.0.0-beta.55"
   },
   "devDependencies": {
     "@nestjs/testing": "^6.1.1",
@@ -38,17 +46,26 @@
     "@types/jest": "^23.3.13",
     "@types/node": "^10.12.18",
     "@types/supertest": "^2.0.7",
+    "assert": "^2.0.0",
+    "husky": "^2.3.0",
     "jest": "^23.6.0",
+    "jest-plugin-context": "^2.9.0",
     "nodemon": "^1.18.9",
     "prettier": "^1.15.3",
     "supertest": "^3.4.1",
     "ts-jest": "^23.10.5",
+    "ts-mockito": "^2.3.1",
     "ts-node": "^7.0.1",
     "tsconfig-paths": "^3.7.0",
-    "tslint": "5.12.1",
-    "typescript": "^3.2.4"
+    "tslint": "^5.12.1",
+    "typescript": "^3.5.1"
   },
   "jest": {
+    "globals": {
+      "ts-jest": {
+        "diagnostics": false
+      }
+    },
     "moduleFileExtensions": [
       "js",
       "json",
@@ -64,7 +81,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "tslint --fix -c ./tslint.json 'src/**/*{.ts,.tsx}'"
+      "pre-commit": "tslint --fix -c ./tslint.json -p ./tsconfig.json 'src/**/*{.ts,.tsx}' && npm run lint"
     }
   }
 }

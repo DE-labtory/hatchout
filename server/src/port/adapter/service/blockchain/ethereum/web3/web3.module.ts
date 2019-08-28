@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import Web3 from 'web3';
 import { Web3Config } from './web3.config';
+import {Web3BridgeService} from './web3.bridge.service';
 
 export const web3Provider = [
   {
@@ -13,8 +14,15 @@ export const web3Provider = [
 ];
 
 @Module({
-  providers: [...web3Provider, Web3Config],
-  exports: [...web3Provider],
+  providers: [
+      ...web3Provider,
+      Web3Config,
+      {provide: 'BridgeService', useValue: Web3BridgeService},
+  ],
+  exports: [
+      ...web3Provider,
+      'BridgeService',
+  ],
 })
 export class Web3Module {
 }

@@ -2,13 +2,16 @@ import {UserServiceImpl} from './user.service.impl';
 import {anything, instance, mock, when} from 'ts-mockito';
 import {TestingModule, Test} from '@nestjs/testing';
 import {User} from '../../domain/user/user.entity';
-import {UserDto} from '../../domain/user/dto/user.dto';
+import {NotAcceptableException, NotFoundException} from '@nestjs/common';
+import {UserDto} from './dto/user.dto';
+import {ValidationException} from '../../domain/exception/ValidationException';
+import {InvalidParameterException} from '../../domain/exception/InvalidParameterException';
 import {UserRepository} from '../../port/persistence/repository/user.repository.impl';
 
 describe('UserServiceImpl', () => {
     const address = 'testAddress';
     const name = 'testName';
-    const mockRepository = mock(UserRepository);
+    const mockRepository: UserRepository = mock(UserRepository);
     let user: User;
     let service: UserServiceImpl;
 
@@ -22,7 +25,7 @@ describe('UserServiceImpl', () => {
                 providers: [
                     UserServiceImpl,
                     {
-                        provide: 'IUserRepository',
+                        provide: 'UserRepository',
                         useValue: instance(mockRepository),
                     },
                 ],
@@ -44,11 +47,13 @@ describe('UserServiceImpl', () => {
 
             expect(await service.get(id)).toBe(user);
         });
-        it('should return undefined', async () => {
+        it('should throw NotFoundException', async () => {
             when(mockRepository.findById(null)).thenReturn(undefined);
             service = new UserServiceImpl(instance(mockRepository));
 
-            expect(await service.get(null)).toBeUndefined();
+            await expect(service.get(null))
+                .rejects
+                .toThrowError(NotFoundException);
         });
     });
     describe('#create()', () => {
@@ -62,33 +67,31 @@ describe('UserServiceImpl', () => {
             service = new UserServiceImpl(instance(mockRepository));
             userDto = new UserDto(address, name);
 
-            expect(await service.create(userDto)).toBe(user);
+            expect(await service.create(address, name)).toBe(user);
         });
-        it('should throw "address should be defined"', async () => {
+        it('should throw InvalidParameterException', async () => {
             when(mockRepository.findByAddress(address)).thenReturn(
                 new Promise((resolve => {resolve(user); }),
                 ),
             );
             service = new UserServiceImpl(instance(mockRepository));
-            userDto = new UserDto();
 
-            await expect(service.create(userDto))
+            await expect(service.create(address, undefined))
                 .rejects
-                .toThrowError('address should be defined');
+                .toThrowError(InvalidParameterException);
         });
-        it('should throw "name should be defined"', async () => {
+        it('should throw InvalidParameterException', async () => {
             when(mockRepository.findByAddress(address)).thenReturn(
                 new Promise((resolve => {resolve(user); }),
                 ),
             );
             service = new UserServiceImpl(instance(mockRepository));
-            userDto = new UserDto(address);
 
-            await expect(service.create(userDto))
+            await expect(service.create(undefined, name))
                 .rejects
-                .toThrowError('name should be defined');
+                .toThrowError(InvalidParameterException);
         });
-        it('should throw "address is already registered"', async () => {
+        it('should throw NotAcceptableException', async () => {
             when(mockRepository.findByAddress(address)).thenReturn(
                 new Promise((resolve => {resolve(user); }),
                 ),
@@ -96,9 +99,9 @@ describe('UserServiceImpl', () => {
             service = new UserServiceImpl(instance(mockRepository));
             userDto = new UserDto(address, name);
 
-            await expect(service.create(userDto))
+            await expect(service.create(address, name))
                 .rejects
-                .toThrowError('address is already registered');
+                .toThrowError(NotAcceptableException);
         });
     });
     describe('#delete()', () => {
@@ -120,35 +123,47 @@ describe('UserServiceImpl', () => {
     });
     describe('#increasePoint()', () => {
         const id = 1;
-        const amount = 10;
+        const validAmount = 10;
+        const invalidAmount = -1;
 
         it('should return user with increased point', async () => {
             when(mockRepository.findById(id)).thenReturn(new Promise((resolve => resolve(user))));
+            when(mockRepository.save(user)).thenReturn(new Promise((resolve) => resolve(user)));
             service = new UserServiceImpl(instance(mockRepository));
 
-            const userReturned = await service.increasePoint(id, amount);
+            const userReturned = await service.increasePoint(id, validAmount);
 
             expect(userReturned).toBeDefined();
-            expect(userReturned.getPoint()).toBe(amount);
+            expect(userReturned.getPoint()).toBe(validAmount);
         });
-        it('should throw error "user with the id is not found"', async () => {
+        it('should throw error NotFoundException', async () => {
             when(mockRepository.findById(id)).thenReturn(undefined);
             service = new UserServiceImpl(instance(mockRepository));
 
-            await expect(service.increasePoint(id, amount))
+            await expect(service.increasePoint(id, validAmount))
                 .rejects
-                .toThrowError('user with the id is not found');
+                .toThrowError(NotFoundException);
+        });
+        it('should throw ValidationException when amount is negative', async () => {
+            when(mockRepository.findById(id)).thenReturn(new Promise((resolve => resolve(user))));
+            service = new UserServiceImpl(instance(mockRepository));
+
+            await expect(service.increasePoint(id, invalidAmount))
+                .rejects
+                .toThrowError(ValidationException);
+
         });
     });
     describe('#decreasePoint()', () => {
         const id = 1;
         const point = 100;
         const validAmount = 10;
-        const invalidAmount = 1000;
+        let invalidAmount: number;
 
         it('should return user with increased level', async () => {
             user = new User(address, name, point);
             when(mockRepository.findById(id)).thenReturn(new Promise((resolve => resolve(user))));
+            when(mockRepository.save(user)).thenReturn(new Promise((resolve) => resolve(user)));
             service = new UserServiceImpl(instance(mockRepository));
 
             const userReturned = await service.decreasePoint(id, validAmount);
@@ -156,31 +171,43 @@ describe('UserServiceImpl', () => {
             expect(userReturned).toBeDefined();
             expect(userReturned.getPoint()).toBe(point - validAmount);
         });
-        it('should throw error "user with the id is not found"', async () => {
+        it('should throw error NotFoundException', async () => {
             when(mockRepository.findById(id)).thenReturn(undefined);
             service = new UserServiceImpl(instance(mockRepository));
 
             await expect(service.decreasePoint(id, validAmount))
                 .rejects
-                .toThrowError('user with the id is not found');
+                .toThrowError(NotFoundException);
         });
-        it('should throw error "can not decrease point"', async () => {
+        it('should throw ValidationException when amount is negative', async () => {
+            invalidAmount = -1;
             user = new User(address, name, point);
             when(mockRepository.findById(id)).thenReturn(new Promise((resolve => resolve(user))));
             service = new UserServiceImpl(instance(mockRepository));
 
             await expect(service.decreasePoint(id, invalidAmount))
                 .rejects
-                .toThrowError('can not decrease point');
+                .toThrowError(ValidationException);
+        });
+        it('should throw ValidationException when point becomes less than MIN_POINT', async () => {
+            invalidAmount = 1000;
+            user = new User(address, name, point);
+            when(mockRepository.findById(id)).thenReturn(new Promise((resolve => resolve(user))));
+            service = new UserServiceImpl(instance(mockRepository));
+
+            await expect(service.decreasePoint(id, invalidAmount))
+                .rejects
+                .toThrowError(ValidationException);
         });
     });
     describe('#increaseLevel()', () => {
         const id = 1;
         const validAmount = 10;
-        const invalidAmount = 1000;
+        let invalidAmount: number;
 
         it('should return user with increased level', async () => {
             when(mockRepository.findById(id)).thenReturn(new Promise((resolve => resolve(user))));
+            when(mockRepository.save(user)).thenReturn(new Promise((resolve) => resolve(user)));
             service = new UserServiceImpl(instance(mockRepository));
 
             const userReturned = await service.increaseLevel(id, validAmount);
@@ -188,21 +215,31 @@ describe('UserServiceImpl', () => {
             expect(userReturned).toBeDefined();
             expect(userReturned.getLevel()).toBe(validAmount);
         });
-        it('should throw error "user with the id is not found"', async () => {
+        it('should throw error NotFoundException', async () => {
             when(mockRepository.findById(id)).thenReturn(undefined);
             service = new UserServiceImpl(instance(mockRepository));
 
             await expect(service.increaseLevel(id, validAmount))
                 .rejects
-                .toThrowError('user with the id is not found');
+                .toThrowError(NotFoundException);
         });
-        it('should throw error "can not increase level"', async () => {
+        it('should throw ValidationException when amount is negative', async () => {
+            invalidAmount = -1;
             when(mockRepository.findById(id)).thenReturn(new Promise((resolve => resolve(user))));
             service = new UserServiceImpl(instance(mockRepository));
 
             await expect(service.increaseLevel(id, invalidAmount))
                 .rejects
-                .toThrowError('can not increase level');
+                .toThrowError(ValidationException);
+        });
+        it('should throw ValidationException when level becomes more than MAX_LEVEL', async () => {
+            invalidAmount = 1000;
+            when(mockRepository.findById(id)).thenReturn(new Promise((resolve => resolve(user))));
+            service = new UserServiceImpl(instance(mockRepository));
+
+            await expect(service.increaseLevel(id, invalidAmount))
+                .rejects
+                .toThrowError(ValidationException);
         });
     });
 });

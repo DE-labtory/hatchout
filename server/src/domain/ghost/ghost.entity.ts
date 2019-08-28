@@ -1,13 +1,41 @@
-import { Entity, Column, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+import {Entity, Column, PrimaryGeneratedColumn, Unique, CreateDateColumn, UpdateDateColumn} from 'typeorm';
 
 @Entity()
+@Unique(['gene'])
 export class Ghost {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   id: number;
 
-  @PrimaryColumn()
+  @Column()
   gene: string;
+
+  @Column({unique: true})
+  tokenId: number;
 
   @Column()
   level: number;
+
+  @Column()
+  userId: string;
+
+  @CreateDateColumn()
+  createdDate: Date;
+
+  @UpdateDateColumn()
+  updateDate: Date;
+
+  constructor(gene: string, tokenId: number, level: number, userId: string) {
+    this.gene = gene;
+    this.tokenId = tokenId;
+    this.level = level;
+    this.userId = userId;
+  }
+
+  public setLevel(level: number) {
+    this.level = level;
+  }
+
+  public setUserId(userId: string) {
+    this.userId = userId;
+  }
 }

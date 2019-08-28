@@ -1,5 +1,6 @@
 .idea/
 .prettierrc
 node_modules/
-.DS_Store/
 .vscode
+.DS_Store
+package-lock.json
