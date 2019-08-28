@@ -3,9 +3,6 @@ import * as fs from "fs";
 import Web3 = require("web3");
 import Utils from "./utils/utils";
 import {
-  BaseMethod,
-  GhostAuctionContractMethod,
-  GhostFactoryContractMethod,
   HatchOutContract,
   HatchOutMethod
 } from "./types";
@@ -14,7 +11,7 @@ import MethodFactory from "./factories/methodFactory";
 
 export default class HatchOut {
   private static VVISP_CONFIG_PATH = __dirname + "/../../vvisp-config.js";
-  private utils: Utils;
+  public utils: Utils;
   public methods: HatchOutMethod;
   private readonly web3: Web3;
 

@@ -2,6 +2,8 @@ import {TransactionReceipt} from "web3/types";
 import BN = require("bn.js");
 
 export interface HatchOutMethod {
+  createEgg(gene: string, owner: string, signature: string): TransactionReceipt;
+
   getGhost(index: string): Ghost;
 
   getGhosts(indices: number[]): Ghost[];
