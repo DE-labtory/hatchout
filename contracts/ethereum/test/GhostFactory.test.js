@@ -27,36 +27,32 @@ contract('MockGhostFactory', accounts => {
     let hash;
 
     beforeEach(async () => {
-      hash = await web3.utils.soliditySha3(geneOfGhost, owner);
-      signature = await web3.eth.sign(hash, owner);
+      hash = await web3.utils.soliditySha3(geneOfGhost);
+      signature = await web3.eth.sign(hash, ceo);
     });
 
     it('reverts when creating ghost that gene is zero', async () => {
-      await shouldFail.reverting(GhostFactory.createEgg(new BN(0), owner, signature));
-    });
-
-    it('reverts when ghost\'s owner is the zero address', async () => {
-      await shouldFail.reverting(GhostFactory.createEgg(geneOfGhost, constants.ZERO_ADDRESS, signature));
+      await shouldFail.reverting(GhostFactory.createEgg(new BN(0), signature, {from: owner}));
     });
 
     it('reverts when ghost\'s gene is too big', async () => {
-      await shouldFail.reverting(GhostFactory.createEgg(constants.MAX_INT256, owner, signature));
+      await shouldFail.reverting(GhostFactory.createEgg(constants.MAX_INT256, signature, {from: owner}));
     });
 
     it('revert when signature is not same', async () => {
-      const wrongSignature = await web3.eth.sign(hash, ceo);
+      const wrongSignature = await web3.eth.sign(hash, owner);
 
-      await shouldFail.reverting(GhostFactory.createEgg(geneOfGhost, owner, wrongSignature));
+      await shouldFail.reverting(GhostFactory.createEgg(geneOfGhost, wrongSignature, {from: owner}));
     });
 
     it('revert when signature is used twice', async () => {
-      await GhostFactory.createEgg(geneOfGhost, owner, signature);
+      await GhostFactory.createEgg(geneOfGhost, signature, {from: owner});
 
-      await shouldFail.reverting(GhostFactory.createEgg(geneOfGhost, owner, signature));
+      await shouldFail.reverting(GhostFactory.createEgg(geneOfGhost, signature, {from: owner}));
     });
 
     it('successfully create egg', async () => {
-      await GhostFactory.createEgg(geneOfGhost, owner, signature);
+      await GhostFactory.createEgg(geneOfGhost, signature, {from: owner});
 
       expect(await GhostFactory.balanceOf(owner)).to.be.bignumber.equal(new BN(1));
     });
@@ -67,39 +63,35 @@ contract('MockGhostFactory', accounts => {
     let hash;
 
     beforeEach(async () => {
-      hash = await web3.utils.soliditySha3(geneOfGhost, owner);
-      signature = await web3.eth.sign(hash, owner);
-      await GhostFactory.createEgg(geneOfGhost, owner, signature);
+      hash = await web3.utils.soliditySha3(geneOfGhost);
+      signature = await web3.eth.sign(hash, ceo);
+      await GhostFactory.createEgg(geneOfGhost, signature, {from: owner});
       hash = await web3.utils.soliditySha3(ghostID, new BN(0));
-      signature = await web3.eth.sign(hash, owner);
+      signature = await web3.eth.sign(hash, ceo);
     });
 
     it('reverts when fee of level up is too low', async () => {
-      await shouldFail.reverting(GhostFactory.levelUp(ceo, ghostID, signature, {from: owner, value: web3.utils.toWei("1", "szabo")}));
-    });
-
-    it('reverts when ghost\'s owner is zero address', async () => {
-      await shouldFail.reverting(GhostFactory.levelUp(constants.ZERO_ADDRESS, ghostID, signature, {from: owner, value: web3.utils.toWei("0", "szabo")}));
+      await shouldFail.reverting(GhostFactory.levelUp(ghostID, signature, {from: owner, value: web3.utils.toWei("0", "szabo")}));
     });
 
     it('reverts when owner who does not have the ghost', async () => {
-      await shouldFail.reverting(GhostFactory.levelUp(ceo, ghostID, signature, {from: owner, value: web3.utils.toWei("1", "szabo")}));
+      await shouldFail.reverting(GhostFactory.levelUp(ghostID, signature, {from: ceo, value: web3.utils.toWei("1", "szabo")}));
     });
 
     it('reverts when signature is not same', async () => {
-      const wrongSignature = await web3.eth.sign(hash, ceo);
+      const wrongSignature = await web3.eth.sign(hash, owner);
 
-      await shouldFail.reverting(GhostFactory.levelUp(owner, ghostID, wrongSignature, {from: owner, value: web3.utils.toWei("1", "szabo")}));
+      await shouldFail.reverting(GhostFactory.levelUp(ghostID, wrongSignature, {from: owner, value: web3.utils.toWei("1", "szabo")}));
     });
 
     it('reverts when signature is used twice', async () => {
-      await GhostFactory.levelUp(owner, ghostID, signature, {from: owner, value: web3.utils.toWei("1", "szabo")});
+      await GhostFactory.levelUp(ghostID, signature, {from: owner, value: web3.utils.toWei("1", "szabo")});
 
-      await shouldFail.reverting(GhostFactory.levelUp(owner, ghostID, signature, {from: owner, value: web3.utils.toWei("1", "szabo")}));
+      await shouldFail.reverting(GhostFactory.levelUp(ghostID, signature, {from: owner, value: web3.utils.toWei("1", "szabo")}));
     });
 
     it('successfully the ghost\'s level up', async () => {
-      await GhostFactory.levelUp(owner, ghostID, signature, {from: owner, value: web3.utils.toWei("1", "szabo")});
+      await GhostFactory.levelUp(ghostID, signature, {from: owner, value: web3.utils.toWei("1", "szabo")});
 
       expect(await GhostFactory.getLevelOfGhost(ghostID)).to.be.bignumber.equal(new BN(1));
     });

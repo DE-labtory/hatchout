@@ -25,7 +25,7 @@ export default class CreateGhost extends Command {
       this.log(
         JSON.stringify(
           await hatchOut.methods
-            .createEgg(args.gene, owner, sig),
+            .createEgg(args.gene, sig),
           undefined,
           2
         )

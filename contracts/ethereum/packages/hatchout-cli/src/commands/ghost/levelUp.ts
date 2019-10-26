@@ -30,7 +30,6 @@ export default class LevelUp extends Command {
       this.log(
         JSON.stringify(
           await hatchOut.methods.levelUp(
-            owner,
             args.ghostIndex,
             sig,
             {

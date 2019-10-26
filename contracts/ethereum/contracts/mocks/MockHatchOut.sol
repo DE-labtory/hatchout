@@ -20,10 +20,6 @@ contract MockHatchOut is HatchOut {
         return address(saleAuction);
     }
 
-    function createEgg(uint64 _gene, address owner) external {
-        _createEgg(_gene, owner);
-    }
-
     function isSaleAuction(uint256 _tokenId) external view returns (bool) {
         address seller;
         (seller, , , , ) = saleAuction.getAuction(_tokenId);

@@ -1,6 +1,7 @@
 const {BN, constants, shouldFail} = require('openzeppelin-test-helpers');
 
 const {expect} = require('chai');
+const Web3 = require('web3');
 
 const MockHatchOut = artifacts.require('mocks/MockHatchOut');
 const MockSpecialAuction = artifacts.require('mocks/MockSpecialAuction');
@@ -12,14 +13,17 @@ contract('MockHatchOut', accounts => {
   let HatchOut;
   let SpecialAuction;
   let SaleAuction;
+  let web3;
 
   let newSpecialAuction;
   let newSaleAuction;
 
   let geneOfGhost;
   let ghostID;
+  let signature;
 
   beforeEach(async () => {
+    web3 = new Web3(Web3.givenProvider || 'ws://some.local-or-remote.node:8546');
     HatchOut = await MockHatchOut.new(ceo, {from: ceo});
     SpecialAuction = await MockSpecialAuction.new(HatchOut.address, {from: ceo});
     SaleAuction = await MockSaleAuction.new(HatchOut.address);
@@ -32,7 +36,9 @@ contract('MockHatchOut', accounts => {
     geneOfGhost = new BN(1);
     ghostID = new BN(0);
 
-    await HatchOut.createEgg(geneOfGhost, ceo);
+    hash = await web3.utils.soliditySha3(geneOfGhost);
+    signature = await web3.eth.sign(hash, ceo);
+    await HatchOut.createEgg(geneOfGhost, signature);
   });
 
   describe('#setAuctionAddresses()', () => {

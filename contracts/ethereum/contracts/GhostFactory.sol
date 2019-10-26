@@ -18,33 +18,29 @@ contract GhostFactory is GhostOwnership {
     // @dev create egg that ghost with level 0.
     //  Must manage ghost ownership.
     // @param _gene - Gene of ghost to be generated.
-    // @param _owner - The address of owner of ghost to be generated.
-    // @param _signature - Signature to verify creation permisson.
-    function createEgg(uint256 _gene, address _owner, bytes calldata _signature) external {
+    // @param _signature - Signature to verify creation permission.
+    function createEgg(uint256 _gene, bytes calldata _signature) external {
         require(_gene != 0);
         require(_gene == uint256(uint64(_gene)));
-        require(_owner != address(0));
         require(!createSignatures[_signature]);
 
-        bytes32 hash = keccak256(abi.encodePacked(_gene, _owner));
+        bytes32 hash = keccak256(abi.encodePacked(_gene));
         bytes32 messageHash = hash.toEthSignedMessageHash();
 
         address signer = messageHash.recover(_signature);
-        require(signer == _owner);
+        require(signer == ceoAddress);
 
         createSignatures[_signature] = true;
-        _createEgg(uint64(_gene), _owner);
+        _createEgg(uint64(_gene), msg.sender);
     }
 
     // TODO: send fee to ceo.
     // @dev increase level of ghost.
-    // @param _owner - owner who has ghost ID
     // @param _tokenId - Ghost ID to level up.
-    // @param _signature - Signature to verify level up permisson.
-    function levelUp(address payable _owner, uint256 _tokenId, bytes calldata _signature) external payable {
+    // @param _signature - Signature to verify level up permission.
+    function levelUp(uint256 _tokenId, bytes calldata _signature) external payable {
         require(msg.value >= levelUpFee);
-        require(_owner != address(0));
-        require(_owns(_owner, _tokenId));
+        require(_owns(msg.sender, _tokenId));
         require(!levelSignatures[_signature]);
 
         uint256 level = ghosts[_tokenId].level;
@@ -52,19 +48,19 @@ contract GhostFactory is GhostOwnership {
         bytes32 messageHash = hash.toEthSignedMessageHash();
 
         address signer = messageHash.recover(_signature);
-        require(signer == _owner);
+        require(signer == ceoAddress);
 
         uint256 fee = msg.value;
 
         if (fee > levelUpFee) {
             uint256 proceeds = fee - levelUpFee;
 
-            _owner.transfer(proceeds);
+            msg.sender.transfer(proceeds);
         }
 
         ceoAddress.transfer(levelUpFee);
 
         levelSignatures[_signature] = true;
-        _levelUp(_owner, _tokenId);
+        _levelUp(msg.sender, _tokenId);
     }
 }
