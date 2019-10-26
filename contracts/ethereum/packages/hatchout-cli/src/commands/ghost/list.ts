@@ -21,7 +21,7 @@ export default class List extends Command {
 
       let indices = [];
       for (let i = 0; i < n; i++)
-        indices.push(i + 1);
+        indices.push(i);
 
       this.log(
         JSON.stringify(await hatchOut.methods.getGhosts(indices), undefined, 2)

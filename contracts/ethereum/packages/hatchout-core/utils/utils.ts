@@ -19,7 +19,7 @@ export default class Utils {
   }
 
   public async createGeneSignature(gene: Mixed): Promise<string> {
-    return await this.createSignature(gene, await this.loadOwnerAddress())
+    return await this.createSignature(gene)
   }
 
   public async createLevelUpSignature(tokenId: Mixed, level: Mixed): Promise<string> {

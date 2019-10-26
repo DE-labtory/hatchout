@@ -67,15 +67,6 @@ module.exports = function(_contractAddr = '') {
         };
         return sendTx(contract.options.address, options ? options.value : 0, loadPrivateKey(), options);
       },
-      levelUp: function(_owner, _tokenId, _signature, options) {
-        const txData = contract.methods.levelUp(_owner, _tokenId, _signature, ).encodeABI();
-        options = {
-          ...options,
-          data: txData,
-          platform: platform
-        };
-        return sendTx(contract.options.address, options ? options.value : 0, loadPrivateKey(), options);
-      },
       transferFrom: function(_from, _to, _tokenId, options) {
         const txData = contract.methods.transferFrom(_from, _to, _tokenId, ).encodeABI();
         options = {
@@ -87,6 +78,15 @@ module.exports = function(_contractAddr = '') {
       },
       setCEO: function(_newCEO, options) {
         const txData = contract.methods.setCEO(_newCEO, ).encodeABI();
+        options = {
+          ...options,
+          data: txData,
+          platform: platform
+        };
+        return sendTx(contract.options.address, options ? options.value : 0, loadPrivateKey(), options);
+      },
+      levelUp: function(_tokenId, _signature, options) {
+        const txData = contract.methods.levelUp(_tokenId, _signature, ).encodeABI();
         options = {
           ...options,
           data: txData,
@@ -112,8 +112,8 @@ module.exports = function(_contractAddr = '') {
         };
         return sendTx(contract.options.address, options ? options.value : 0, loadPrivateKey(), options);
       },
-      createEgg: function(_gene, _owner, _signature, options) {
-        const txData = contract.methods.createEgg(_gene, _owner, _signature, ).encodeABI();
+      createEgg: function(_gene, _signature, options) {
+        const txData = contract.methods.createEgg(_gene, _signature, ).encodeABI();
         options = {
           ...options,
           data: txData,
