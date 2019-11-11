@@ -1,186 +1,178 @@
 import {GhostService} from './ghost.service';
-import {anything, instance, mock, objectContaining, when} from 'ts-mockito';
+import {anything, instance, mock, when} from 'ts-mockito';
 import {Ghost} from '../../domain/ghost/ghost.entity';
 import {GhostRepository} from '../../port/persistence/repository/ghost.repository.impl';
-import {IGhostRepository} from '../../domain/ghost/ghost.repository';
-import {GhostDto} from './dto/ghost.dto';
+import {UserRepository} from '../../port/persistence/repository/user.repository.impl';
+import {NotFoundException} from '@nestjs/common';
+import {ValidationException} from '../../domain/exception/ValidationException';
+import {User} from '../../domain/user/user.entity';
 
 describe('GhostService', () => {
+
   let service: GhostService;
-  const mockGhost: Ghost = new Ghost(
-    'FF9182839',
-    1,
-    1,
-    'userId1',
-  );
-  const mockGhost2: Ghost = new Ghost(
-    'ABF938481',
-    2,
-    1,
-    'userId2',
-  );
+  let mockGhost1: Ghost;
+  let mockGhost2: Ghost;
+  const mockGhostRepository: GhostRepository = mock(GhostRepository);
+  const mockUserRepository: UserRepository = mock(UserRepository);
 
-  describe('#findOne()', async () => {
-    const repository: GhostRepository = mock(GhostRepository);
+  beforeEach(() => {
+    mockGhost1 = new Ghost(
+      'FF9182839',
+      1,
+      'userAddress1',
+    );
+    mockGhost2 = new Ghost(
+      'ABF938481',
+      2,
+      'userAddress2',
+    );
+  });
 
-    it('should find one ghost', async () => {
-      when(repository.findOne(1)).thenReturn(new Promise((res) => {
-        res(mockGhost);
+  describe('#get()', async () => {
+
+    it('should return ghost', async () => {
+      when(mockGhostRepository.findById(1)).thenReturn(new Promise((res) => {
+        res(mockGhost1);
       }));
-      const repositoryImpl: IGhostRepository = instance(repository);
 
-      service = new GhostService(repositoryImpl);
-      const ghost = await service.findOne(1);
-      expect(ghost).toEqual(mockGhost);
+      service = new GhostService(instance(mockGhostRepository), instance(mockUserRepository));
+      expect(await service.get(1)).toEqual(mockGhost1);
+    });
+    it('should throw NotFoundException', async () => {
+      when(mockGhostRepository.findById(1)).thenReturn(undefined);
+      service = new GhostService(instance(mockGhostRepository), instance(mockUserRepository));
+
+      await expect(service.get(1))
+        .rejects
+        .toThrowError(NotFoundException);
     });
   });
 
-  describe('#findOneByGene()', async () => {
-    const repository: GhostRepository = mock(GhostRepository);
+  describe('#getByGene()', async () => {
 
-    it('should find ghost by gene', async () => {
-      const option = {
-        gene: 'FF9182839',
-      };
-
-      when(repository.findOne(objectContaining(option))).thenReturn(new Promise((res) => {
-        res(mockGhost);
+    it('should return ghost', async () => {
+      when(mockGhostRepository.findByGene(mockGhost1.getGene())).thenReturn(new Promise((res) => {
+        res(mockGhost1);
       }));
-      const repositoryImpl: IGhostRepository = instance(repository);
+      service = new GhostService(instance(mockGhostRepository), instance(mockUserRepository));
 
-      service = new GhostService(repositoryImpl);
-      const ghost = await service.findOneByGene('FF9182839');
-      expect(ghost).toEqual(mockGhost);
+      expect(await service.getByGene('FF9182839')).toEqual(mockGhost1);
+    });
+    it('should throw NotFoundException', async () => {
+      when(mockGhostRepository.findByGene('wrongGene')).thenReturn(undefined);
+      service = new GhostService(instance(mockGhostRepository), instance(mockUserRepository));
+
+      await expect(service.getByGene('wrongGene'))
+        .rejects
+        .toThrowError(NotFoundException);
+    });
+
+  });
+
+  describe('#getByUser()', async () => {
+
+    it('should return ghosts', async () => {
+      when(mockGhostRepository.findByUserAddress(mockGhost1.getUserAddress())).thenReturn(new Promise((res) => {
+        res([mockGhost1]);
+      }));
+
+      service = new GhostService(instance(mockGhostRepository), instance(mockUserRepository));
+      const ghosts: Ghost[] = await service.getByUser(mockGhost1.getUserAddress());
+      expect(ghosts).toEqual([mockGhost1]);
+    });
+    it('should throw NotFoundException', async () => {
+      // todo: check if repository give [] when it doesn't find at all
+      when(mockGhostRepository.findByUserAddress('wrongUserAddress')).thenReturn(new Promise((res) => {
+        res([]);
+      }));
+
+      await expect(service.getByUser('wrongUserAddress'))
+        .rejects
+        .toThrowError(NotFoundException);
     });
   });
 
-  describe('#findAllByUser()', async () => {
-    const repository: GhostRepository = mock(GhostRepository);
-
-    it('should find ghosts by userid', async () => {
-      when(repository.find(anything())).thenReturn(new Promise((res) => {
-        res([mockGhost]);
-      }));
-      const repositoryImpl: IGhostRepository = instance(repository);
-
-      service = new GhostService(repositoryImpl);
-      const ghosts: Ghost[] = await service.findAllByUser(mockGhost.userId);
-      expect(ghosts).toEqual([mockGhost]);
-    });
-  });
-
-  describe('#findAll()', async () => {
-    const repository: GhostRepository = mock(GhostRepository);
+  describe('#getByPage()', async () => {
 
     it('should find page 1 ghosts', async () => {
-      const option = {
-        take: 25,
-        skip: 0,
-      };
-
-      when(repository.find(objectContaining(option))).thenReturn(new Promise((res) => {
-        res([mockGhost, mockGhost2]);
+      when(mockGhostRepository.findByPage(1)).thenReturn(new Promise((res) => {
+        res([mockGhost1, mockGhost2]);
       }));
-      const repositoryImpl: IGhostRepository = instance(repository);
+      service = new GhostService(instance(mockGhostRepository), instance(mockUserRepository));
 
-      service = new GhostService(repositoryImpl);
-      const ghost = await service.findAll(1);
-      expect(ghost).toEqual([mockGhost, mockGhost2]);
+      expect(await service.getByPage(1)).toEqual([mockGhost1, mockGhost2]);
     });
 
     it('should find page 1 ghosts when page number is less then 1', async () => {
-      const option = {
-        take: 25,
-        skip: 0,
-      };
-
-      when(repository.find(objectContaining(option))).thenReturn(new Promise((res) => {
-        res([mockGhost, mockGhost2]);
-      }));
-      const repositoryImpl: GhostRepository = instance(repository);
-
-      service = new GhostService(repositoryImpl);
-      const ghost = await service.findAll(0);
-      expect(ghost).toEqual([mockGhost, mockGhost2]);
+      service = new GhostService(instance(mockGhostRepository), instance(mockUserRepository));
+      await expect(service.getByPage(0))
+        .rejects
+        .toThrowError(ValidationException);
     });
   });
 
-  describe('#createEgg()', async () => {
-    const repository: GhostRepository = mock(GhostRepository);
-    let ghostDto: GhostDto;
+  describe('#createEgg()', () => {
+    it('should return ghost', async () => {
+      when(mockGhostRepository.findByGene(anything())).thenResolve(undefined);
+      when(mockGhostRepository.save(anything())).thenResolve(mockGhost1);
+      service = new GhostService(instance(mockGhostRepository), instance(mockUserRepository));
 
-    it('should create egg of ghost', async () => {
-      const newGhost = new Ghost(
-          'EB123F345',
-          3,
-          0,
-          'userId3',
-      );
+      expect(await service.createEgg(mockGhost1.getGene(), mockGhost1.getTokenId(), mockGhost1.getUserAddress()))
+        .toBe(mockGhost1);
+    });
+    it('should throw ValidationException', async () => {
+      when(mockGhostRepository.findByGene(anything())).thenResolve(mockGhost1);
+      service = new GhostService(instance(mockGhostRepository), instance(mockUserRepository));
 
-      when(repository.findOne(3)).thenReturn(new Promise((res) => {
-        res(newGhost);
-      }));
-
-      const repositoryImpl: IGhostRepository = instance(repository);
-
-      ghostDto = new GhostDto('userId3', 'EB123F345');
-      service = new GhostService(repositoryImpl);
-      await service.createEgg(ghostDto);
-
-      const ghost = await service.findOne(3);
-      expect(ghost).toEqual(newGhost);
+      await expect(service.createEgg(mockGhost1.getGene(), mockGhost1.tokenId, mockGhost1.getUserAddress()))
+        .rejects
+        .toThrowError(ValidationException);
     });
   });
 
   describe('#transfer()', async () => {
-    const repository: GhostRepository = mock(GhostRepository);
+    const exUser: User = new User('userAddress1', 'userName1');
+    const newUser: User = new User('userAddress2', 'userName2');
+    it('should return ghost with changed userAddress', async () => {
+      when(mockUserRepository.findByAddress(exUser.getAddress())).thenResolve(exUser);
+      when(mockGhostRepository.findByUserAddress(exUser.getAddress())).thenResolve([mockGhost1]);
+      when(mockUserRepository.findByAddress(newUser.getAddress())).thenResolve(newUser);
+      when(mockGhostRepository.findByGene(mockGhost1.getGene())).thenResolve(mockGhost1);
+      when(mockGhostRepository.save(anything())).thenCall((g) => g);
 
-    it('should transfer owner to receiver', async () => {
-      when(repository.findOne(1)).thenReturn(new Promise((res) => {
-        res(mockGhost2);
-      }));
+      service = new GhostService(instance(mockGhostRepository), instance(mockUserRepository));
+      const ghost = await service.transfer(exUser.getAddress(), newUser.getAddress(), mockGhost1.getGene());
+      expect(ghost.getUserAddress()).toBe(newUser.getAddress());
+    });
+    it('should throw NotFoundException', async () => {
+      when(mockUserRepository.findByAddress(exUser.getAddress())).thenResolve(undefined);
+      service = new GhostService(instance(mockGhostRepository), instance(mockUserRepository));
 
-      const option = {
-        gene: 'ABF938481',
-      };
+      await expect(service.transfer(exUser.getAddress(), newUser.getAddress(), mockGhost1.getGene()))
+        .rejects
+        .toThrowError(NotFoundException);
+    });
+    it('should throw ValidationException', async () => {
+      when(mockUserRepository.findByAddress(exUser.getAddress())).thenResolve(exUser);
+      when(mockGhostRepository.findByUserAddress(exUser.getAddress())).thenResolve([]);
+      service = new GhostService(instance(mockGhostRepository), instance(mockUserRepository));
 
-      when(repository.findOne(objectContaining(option))).thenReturn(new Promise((res) => {
-        res(mockGhost2);
-      }));
-
-      const repositoryImpl: IGhostRepository = instance(repository);
-
-      service = new GhostService(repositoryImpl);
-      await service.transfer('userId1', 'userId2', 'ABF938481');
-
-      const ghost = await service.findOne(1);
-      expect(ghost.userId).toEqual('userId2');
+      await expect(service.transfer(exUser.getAddress(), newUser.getAddress(), mockGhost1.getGene()))
+        .rejects
+        .toThrowError(ValidationException);
     });
   });
 
-  describe('#levelUp()', async () => {
-    const repository: GhostRepository = mock(GhostRepository);
+  describe('#increaseLevel()', async () => {
+    const amount = 10;
+    it('should return ghost with increased level', async () => {
+      when(mockGhostRepository.findByGene(mockGhost1.getGene())).thenResolve(mockGhost1);
+      when(mockGhostRepository.save(anything())).thenCall((g) => g);
+      service = new GhostService(instance(mockGhostRepository), instance(mockUserRepository));
+      const exLevel = mockGhost1.getLevel();
 
-    it('should increase level of ghost', async () => {
-      when(repository.findOne(1)).thenReturn(new Promise((res) => {
-        res(mockGhost2);
-      }));
-
-      const option = {
-        gene: 'ABF938481',
-      };
-
-      when(repository.findOne(objectContaining(option))).thenReturn(new Promise((res) => {
-        res(mockGhost2);
-      }));
-
-      const repositoryImpl: IGhostRepository = instance(repository);
-
-      service = new GhostService(repositoryImpl);
-      await service.levelUp('ABF938481', 2);
-
-      const ghost = await service.findOne(1);
-      expect(ghost.level).toEqual(2);
+      const ghost = await service.increaseLevel(mockGhost1.getGene(), amount);
+      expect(ghost.getLevel()).toBe(exLevel + amount);
     });
   });
 });

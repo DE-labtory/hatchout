@@ -1,12 +1,11 @@
 import {
-    Body,
     Controller,
     Delete,
     Get,
     Inject,
     Injectable,
     Param, ParseIntPipe,
-    Post, Put,
+    Put,
     Query,
 } from '@nestjs/common';
 import {User} from '../../domain/user/user.entity';

@@ -1,66 +1,92 @@
-import {Injectable} from '@nestjs/common';
+import {Injectable, NotFoundException} from '@nestjs/common';
 import {Ghost} from '../../domain/ghost/ghost.entity';
 import {InjectRepository} from '@nestjs/typeorm';
 import {IGhostRepository} from '../../domain/ghost/ghost.repository';
-import {GhostDto} from './dto/ghost.dto';
+import {User} from '../../domain/user/user.entity';
+import {IUserRepository} from '../../domain/user/user.repository';
+import {ValidationException} from '../../domain/exception/ValidationException';
 
 @Injectable()
 export class GhostService {
-  constructor(@InjectRepository(Ghost) private ghostRepository: IGhostRepository) {
+  constructor(@InjectRepository(Ghost) private ghostRepository: IGhostRepository, @InjectRepository(User) private userRepository: IUserRepository) {
   }
 
-  async findOne(id: number): Promise<Ghost> {
-    return await this.ghostRepository.findOne(id);
-  }
-
-  async findOneByGene(gene: string): Promise<Ghost> {
-    return await this.ghostRepository.findOne(
-        {
-          gene,
-        },
-    );
-  }
-
-  async findAllByUser(userId: string): Promise<Ghost[]> {
-    return await this.ghostRepository.find(
-      {
-        userId,
-      },
-    );
-  }
-
-  async findAll(page: number): Promise<Ghost[]> {
-    if (page < 1) {
-      page = 1;
+  async get(id: number): Promise<Ghost> {
+    const ghost = await this.ghostRepository.findById(id);
+    if (ghost === undefined) {
+      throw new NotFoundException('ghost with the id is not found');
     }
-    return await this.ghostRepository.find({
-      take: 25,
-      skip: 25 * (page - 1),
-    });
+    return ghost;
   }
 
-  async createEgg(ghostDto: GhostDto): Promise<Ghost> {
-    const newGhost = new Ghost(ghostDto.gene, ghostDto.tokenId, 0, ghostDto.owner);
-    return await this.ghostRepository.save(newGhost);
+  async getByGene(gene: string): Promise<Ghost> {
+    const ghost = await this.ghostRepository.findByGene(gene);
+    if (ghost === undefined) {
+      throw new NotFoundException('ghost with the gene is not found');
+    }
+    return ghost;
+  }
+
+  async getByUser(userAddress: string): Promise<Ghost[]> {
+    const ghosts = await this.ghostRepository.findByUserAddress(userAddress);
+    // todo: check if length is 0 when repository doesn't find at all
+    if (ghosts.length === 0) {
+      throw new NotFoundException('ghost with the userAddress is not found');
+    }
+    return ghosts;
+  }
+
+  async getByPage(page: number): Promise<Ghost[]> {
+    if (page < 1 || 25 < page) {
+      throw new ValidationException('not allowed page');
+    }
+
+    return await this.ghostRepository.findByPage(page);
+  }
+
+  async createEgg(gene: string, tokenId: number, ownerAddress: string): Promise<Ghost> {
+    const ghost = await this.ghostRepository.findByGene(gene);
+    if (ghost !== undefined) {
+      throw new ValidationException('this gene is already registered');
+    }
+    return await this.ghostRepository.save(new Ghost(gene, tokenId, ownerAddress));
   }
 
   async transfer(from: string, to: string, gene: string): Promise<Ghost> {
-    const updatedGhost = await this.ghostRepository.findOne(
-        {
-          gene,
-        },
-    );
-    updatedGhost.setUserId(to);
-    return await this.ghostRepository.save(updatedGhost);
+    const exOwner: User = await this.userRepository.findByAddress(from);
+    if (exOwner === undefined) {
+      throw new NotFoundException(`user doesn't exist`);
+    }
+
+    if (!await this.isOwning(exOwner, gene)) {
+      throw new ValidationException(`user doesn't own gene`);
+    }
+
+    const newOwner: User = await this.userRepository.findByAddress(to);
+    if (newOwner === undefined) {
+      throw new NotFoundException(`user doesn't exist`);
+    }
+
+    const ghost = await this.ghostRepository.findByGene(gene);
+    if (ghost === undefined) {
+      throw new NotFoundException(`ghost doesn't exist`);
+    }
+
+    return await this.ghostRepository.save(ghost.changeUser(newOwner));
   }
 
-  async levelUp(gene: string, level: number): Promise<Ghost> {
-    const updatedGhost = await this.ghostRepository.findOne(
-        {
-          gene,
-        },
-    );
-    updatedGhost.setLevel(level);
-    return await this.ghostRepository.save(updatedGhost);
+  async increaseLevel(gene: string, amount: number): Promise<Ghost> {
+    const ghost = await this.ghostRepository.findByGene(gene);
+    if (ghost  === undefined) {
+      throw new NotFoundException(`ghost doesn't exist`);
+    }
+
+    return await this.ghostRepository.save(ghost.increaseLevel(amount));
+  }
+
+  private async isOwning(user: User, gene: string) {
+    // todo: check when ghosts none;
+    const ghosts: Ghost[] = await this.ghostRepository.findByUserAddress(user.getAddress());
+    return ghosts.some((ghost) => ghost.getGene() === gene);
   }
 }

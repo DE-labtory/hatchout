@@ -5,9 +5,6 @@ import {TypeOrmModule} from '@nestjs/typeorm';
 import {GhostRepository} from '../persistence/repository/ghost.repository.impl';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([GhostRepository]),
-    ],
     controllers: [GhostController],
     providers: [
         {

@@ -13,8 +13,7 @@ describe('Ghost Controller', () => {
     ghost = new Ghost(
         'EE398A811',
         1,
-        0,
-        'user1',
+        'userAddress1',
     );
   });
 
@@ -35,46 +34,46 @@ describe('Ghost Controller', () => {
 
   describe('#findOne()', () => {
     it('should find one ghost', async () => {
-      when(mockGhostService.findOne(1)).thenReturn(new Promise((resolve) => {
+      when(mockGhostService.get(1)).thenReturn(new Promise((resolve) => {
         resolve(ghost);
       }));
       controller = new GhostController(instance(mockGhostService));
 
-      expect(await controller.findOne(1)).toBe(ghost);
+      expect(await controller.getById(1)).toBe(ghost);
     });
   });
 
   describe('#findOneByGene', () => {
     it('should find one ghost by gene', async () => {
-      when(mockGhostService.findOneByGene('EE398A811')).thenReturn(new Promise((resolve) => {
+      when(mockGhostService.getByGene('EE398A811')).thenReturn(new Promise((resolve) => {
         resolve(ghost);
       }));
       controller = new GhostController(instance(mockGhostService));
 
-      expect(await controller.findOneByGene('EE398A811')).toBe(ghost);
+      expect(await controller.getByGene('EE398A811')).toBe(ghost);
     });
   });
 
   describe('#findAllByUser()', () => {
     it('should find ghosts by ID of user', async () => {
-      when(mockGhostService.findAllByUser('user1')).thenReturn(new Promise((resolve) => {
+      when(mockGhostService.getByUser('user1')).thenReturn(new Promise((resolve) => {
         resolve([ghost]);
       }));
       controller = new GhostController(instance(mockGhostService));
 
-      expect(await controller.findAllByUser('user1')).toEqual([ghost]);
+      expect(await controller.getByUser('user1')).toEqual([ghost]);
     });
   });
 
   describe('#findAll()', () => {
     it('should find page 1 ghosts', async () => {
 
-      when(mockGhostService.findAll(1)).thenReturn(new Promise((resolve) => {
+      when(mockGhostService.getByPage(1)).thenReturn(new Promise((resolve) => {
         resolve([ghost]);
       }));
       controller = new GhostController(instance(mockGhostService));
 
-      expect(await controller.findAll(1)).toEqual([ghost]);
+      expect(await controller.getByPage(1)).toEqual([ghost]);
     });
   });
 });
