@@ -1,8 +1,8 @@
 import {Body, Controller, Get, Inject, Injectable, Param, Post, Put, Query} from '@nestjs/common';
 import {Ghost} from '../../domain/ghost/ghost.entity';
-import {GhostService} from '../../app/ghost/ghost.service';
 import {GhostDto} from '../../app/ghost/dto/ghost.dto';
 import {QueryParamDto} from '../../app/ghost/dto/query.param.dto';
+import {GhostService} from '../../app/ghost/ghost.service';
 
 @Injectable()
 @Controller('ghosts')
@@ -11,18 +11,19 @@ export class GhostController {
 
   @Get(':id')
   async getById(@Param('id') id: number): Promise<Ghost> {
-      return await this.service.get(id);
+      return await this.service.getById(id);
   }
 
   @Get()
-  async get(@Query() params: QueryParamDto): Promise<Ghost[]> {
+  async get(@Query('gene') gene: string, @Query('userAddress') userAddress, @Query('page') page: number): Promise<Ghost[]> {
     let ghosts: Ghost[] = [];
-    if (params.gene !== undefined) {
-      ghosts.push(await this.service.getByGene(params.gene));
-    } else if (params.userAddress !== undefined) {
-      ghosts = await this.service.getByUser(params.userAddress);
-    } else if (params.page !== undefined) {
-      ghosts = await this.service.getByPage(params.page);
+    // todo: refac
+    if (gene !== undefined) {
+      ghosts.push(await this.service.getByGene(gene));
+    } else if (userAddress !== undefined) {
+      ghosts = await this.service.getByUser(userAddress);
+    } else if (page !== undefined) {
+      ghosts = await this.service.getByPage(page);
     }
 
     return ghosts;
