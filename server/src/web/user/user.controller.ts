@@ -23,6 +23,7 @@ export class UserController {
     async get(@Param('id') id: number): Promise<User> {
         return await this.service.get(id);
     }
+    // hahaha
     @Delete(':id')
     async delete(@Param('id') id: number): Promise<DeleteResult> {
         return await this.service.delete(id);
