@@ -6,7 +6,7 @@ import {GhostService} from '../../app/ghost/ghost.service';
 import {GhostServiceImpl} from '../../app/ghost/ghost.service.impl';
 
 describe('Ghost Controller', () => {
-  const mockGhostService: GhostService = mock(GhostServiceImpl);
+  const mockGhostService: GhostService = mock<GhostService>();
   let ghost: Ghost;
   let controller: GhostController;
 
@@ -24,7 +24,7 @@ describe('Ghost Controller', () => {
         controllers: [GhostController],
         providers: [{
           provide: 'GhostService',
-          useValue: instance(mockGhostService),
+          useValue: instance(mock(GhostServiceImpl)),
         }],
       }).compile();
 
