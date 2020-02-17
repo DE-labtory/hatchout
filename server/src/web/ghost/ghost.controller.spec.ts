@@ -1,11 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GhostController } from './ghost.controller';
 import {instance, mock, when} from 'ts-mockito';
-import {GhostService} from '../../app/ghost/ghost.service';
 import {Ghost} from '../../domain/ghost/ghost.entity';
+import {GhostService} from '../../app/ghost/ghost.service';
+import {GhostServiceImpl} from '../../app/ghost/ghost.service.impl';
 
 describe('Ghost Controller', () => {
-  const mockGhostService: GhostService = mock(GhostService);
+  const mockGhostService: GhostService = mock<GhostService>();
   let ghost: Ghost;
   let controller: GhostController;
 
@@ -13,8 +14,7 @@ describe('Ghost Controller', () => {
     ghost = new Ghost(
         'EE398A811',
         1,
-        0,
-        'user1',
+        'userAddress1',
     );
   });
 
@@ -24,7 +24,7 @@ describe('Ghost Controller', () => {
         controllers: [GhostController],
         providers: [{
           provide: 'GhostService',
-          useValue: instance(mockGhostService),
+          useValue: instance(mock(GhostServiceImpl)),
         }],
       }).compile();
 
@@ -33,48 +33,46 @@ describe('Ghost Controller', () => {
     });
   });
 
-  describe('#findOne()', () => {
-    it('should find one ghost', async () => {
-      when(mockGhostService.findOne(1)).thenReturn(new Promise((resolve) => {
+  describe('#getById()', () => {
+    it('should return ghost', async () => {
+      const id: number = 1;
+      when(mockGhostService.getById(id)).thenReturn(new Promise((resolve) => {
         resolve(ghost);
       }));
       controller = new GhostController(instance(mockGhostService));
 
-      expect(await controller.findOne(1)).toBe(ghost);
+      expect(await controller.getById(id)).toBe(ghost);
     });
   });
 
-  describe('#findOneByGene', () => {
-    it('should find one ghost by gene', async () => {
-      when(mockGhostService.findOneByGene('EE398A811')).thenReturn(new Promise((resolve) => {
+  describe('#get()', () => {
+    it('should return ghost with gene parameter', async () => {
+      const gene: string = 'EE398A811';
+      when(mockGhostService.getByGene(gene)).thenReturn(new Promise((resolve) => {
         resolve(ghost);
       }));
       controller = new GhostController(instance(mockGhostService));
 
-      expect(await controller.findOneByGene('EE398A811')).toBe(ghost);
+      expect(await controller.get(gene, undefined, undefined)).toEqual([ghost]);
     });
-  });
-
-  describe('#findAllByUser()', () => {
-    it('should find ghosts by ID of user', async () => {
-      when(mockGhostService.findAllByUser('user1')).thenReturn(new Promise((resolve) => {
+    it('should return ghosts with userId', async () => {
+      const userId: string = 'user1';
+      when(mockGhostService.getByUser(userId)).thenReturn(new Promise((resolve) => {
         resolve([ghost]);
       }));
       controller = new GhostController(instance(mockGhostService));
 
-      expect(await controller.findAllByUser('user1')).toEqual([ghost]);
+      expect(await controller.get(undefined, userId, undefined)).toEqual([ghost]);
     });
-  });
+    it('should return ghosts with page', async () => {
 
-  describe('#findAll()', () => {
-    it('should find page 1 ghosts', async () => {
-
-      when(mockGhostService.findAll(1)).thenReturn(new Promise((resolve) => {
+      const page: number = 1;
+      when(mockGhostService.getByPage(page)).thenReturn(new Promise((resolve) => {
         resolve([ghost]);
       }));
       controller = new GhostController(instance(mockGhostService));
 
-      expect(await controller.findAll(1)).toEqual([ghost]);
+      expect(await controller.get(undefined, undefined, page)).toEqual([ghost]);
     });
   });
 });

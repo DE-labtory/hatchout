@@ -1,18 +1,13 @@
 import { Module } from '@nestjs/common';
-import {GhostService} from '../../app/ghost/ghost.service';
 import {GhostController} from '../../web/ghost/ghost.controller';
-import {TypeOrmModule} from '@nestjs/typeorm';
-import {GhostRepository} from '../persistence/repository/ghost.repository.impl';
+import {GhostServiceImpl} from '../../app/ghost/ghost.service.impl';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([GhostRepository]),
-    ],
     controllers: [GhostController],
     providers: [
         {
             provide: 'GhostService',
-            useClass: GhostService,
+            useClass: GhostServiceImpl,
         },
     ],
 })
