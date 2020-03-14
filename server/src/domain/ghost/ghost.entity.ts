@@ -10,16 +10,25 @@ export class Ghost {
   id: number;
 
   @Column()
+  name: string;
+
+  @Column()
   gene: string;
 
   @Column({unique: true})
   tokenId: number;
 
   @Column()
+  userAddress: string;
+
+  @Column()
   level: number;
 
   @Column()
-  userAddress: string;
+  angelPoint: number;
+
+  @Column()
+  devilPoint: number;
 
   @CreateDateColumn()
   createdDate: Date;
